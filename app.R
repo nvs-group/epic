@@ -384,25 +384,23 @@ server <- function(input, output, session) {
       years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       y <- 0
       a <- input$age.begin
-      for(i in (a:(a + (years - 1)))) {
-        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+      for(i in (1:years)) {
+        af <- (1 + ((0.00002 * ((i + a) ^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- as.double(new_var()[1,] %>% select(InStOff))
         y <- y - x
-        s1 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        s1 <- list(age1 = (i + a), age_factor1 = af, xsalary1 = x, run_total1 = y)
         salary1 <- rbind(salary1, s1)
       }
       x <- as.double(new_var()[1,] %>% select(X17p))
       a <- input$age.begin + years
       af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
-      y <- x + y
-      s1 <- list(age1 = a, age_factor1 = af, xsalary1 = x, run_total1 = y)
-      salary1 <- rbind(salary1, s1)
-      for(i in (a+1:input$career.length)) {
-        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+      x <- x / af
+      for(i in (1:input$career.length)) {
+        af <- (1 + ((0.00002 * ((i + a)^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- x * af
         x <- round(x, 0)
         y <- x + y
-        s1 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        s1 <- list(age1 = (i + a), age_factor1 = af, xsalary1 = x, run_total1 = y)
         salary1 <- rbind(salary1, s1)
       }
       totalcost1 <- new_var()$InStOff[1] * years
@@ -447,29 +445,25 @@ server <- function(input, output, session) {
       })
       dc <- new_var()$degree.code[2]
       years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
-      
       y <- 0
       a <- input$age.begin
-      
-      for(i in (a:(a + (years - 1)))) {
-        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+      for(i in (1:years)) {
+        af <- (1 + ((0.00002 * ((i + a) ^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- as.double(new_var()[2,] %>% select(InStOff))
         y <- y - x
-        s2 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        s2 <- list(age1 = (i + a), age_factor1 = af, xsalary1 = x, run_total1 = y)
         salary2 <- rbind(salary2, s2)
       }
       x <- as.double(new_var()[2,] %>% select(X17p))
       a <- input$age.begin + years
       af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
-      y <- x + y
-      s2 <- list(age1 = a, age_factor1 = af, xsalary1 = x, run_total1 = y)
-      salary2 <- rbind(salary2, s2)
-      for(i in (a+1:input$career.length)) {
-        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+      x <- x / af
+      for(i in (1:input$career.length)) {
+        af <- (1 + ((0.00002 * ((i + a)^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- x * af
         x <- round(x, 0)
         y <- x + y
-        s2 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        s2 <- list(age1 = (i + a), age_factor1 = af, xsalary1 = x, run_total1 = y)
         salary2 <- rbind(salary2, s2)
       }
       totalcost1 <- new_var()$InStOff[2] * years
@@ -521,26 +515,23 @@ server <- function(input, output, session) {
       years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       y <- 0
       a <- input$age.begin
-      
-      for(i in (a:(a + (years - 1)))) {
-        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+      for(i in (1:years)) {
+        af <- (1 + ((0.00002 * ((i + a) ^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- as.double(new_var()[3,] %>% select(InStOff))
         y <- y - x
-        s3 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        s3 <- list(age1 = (i + a), age_factor1 = af, xsalary1 = x, run_total1 = y)
         salary3 <- rbind(salary3, s3)
       }
       x <- as.double(new_var()[3,] %>% select(X17p))
       a <- input$age.begin + years
       af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
-      y <- x + y
-      s3 <- list(age1 = a, age_factor1 = af, xsalary1 = x, run_total1 = y)
-      salary3 <- rbind(salary3, s3)
-      for(i in (a+1:input$career.length)) {
-        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+      x <- x / af
+      for(i in (1:input$career.length)) {
+        af <- (1 + ((0.00002 * ((i + a)^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- x * af
         x <- round(x, 0)
         y <- x + y
-        s3 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        s3 <- list(age1 = (i + a), age_factor1 = af, xsalary1 = x, run_total1 = y)
         salary3 <- rbind(salary3, s3)
       }
       totalcost1 <- new_var()$InStOff[3] * years
