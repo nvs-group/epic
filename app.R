@@ -383,7 +383,7 @@ server <- function(input, output, session) {
       dc <- new_var()$degree.code[1]
       years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       y <- 0
-      a <- input$age.begin
+      a <- input$age.begin - 1
       for(i in (1:years)) {
         af <- (1 + ((0.00002 * ((i + a) ^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- as.double(new_var()[1,] %>% select(InStOff))
@@ -392,7 +392,7 @@ server <- function(input, output, session) {
         salary1 <- rbind(salary1, s1)
       }
       x <- as.double(new_var()[1,] %>% select(X17p))
-      a <- input$age.begin + years
+      a <- input$age.begin + years - 1
       af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
       x <- x / af
       for(i in (1:input$career.length)) {
@@ -446,7 +446,7 @@ server <- function(input, output, session) {
       dc <- new_var()$degree.code[2]
       years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       y <- 0
-      a <- input$age.begin
+      a <- input$age.begin - 1
       for(i in (1:years)) {
         af <- (1 + ((0.00002 * ((i + a) ^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- as.double(new_var()[2,] %>% select(InStOff))
@@ -455,7 +455,7 @@ server <- function(input, output, session) {
         salary2 <- rbind(salary2, s2)
       }
       x <- as.double(new_var()[2,] %>% select(X17p))
-      a <- input$age.begin + years
+      a <- input$age.begin + years - 1
       af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
       x <- x / af
       for(i in (1:input$career.length)) {
@@ -514,7 +514,7 @@ server <- function(input, output, session) {
       dc <- new_var()$degree.code[3]
       years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       y <- 0
-      a <- input$age.begin
+      a <- input$age.begin - 1
       for(i in (1:years)) {
         af <- (1 + ((0.00002 * ((i + a) ^ 2)) - 0.0034 * (i + a) + 0.127 ))
         x <- as.double(new_var()[3,] %>% select(InStOff))
@@ -523,7 +523,7 @@ server <- function(input, output, session) {
         salary3 <- rbind(salary3, s3)
       }
       x <- as.double(new_var()[3,] %>% select(X17p))
-      a <- input$age.begin + years
+      a <- input$age.begin + years - 1
       af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
       x <- x / af
       for(i in (1:input$career.length)) {
