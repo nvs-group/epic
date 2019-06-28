@@ -10,7 +10,6 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
-#master1 <- read.csv("master1.txt")
 master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1")
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
@@ -29,11 +28,15 @@ cip_group4 <- (cip1$CIP_Category[29:37])
 salary1 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double(), run_total1 = double())
 salary2 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double(), run_total1 = double())
 salary3 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double(), run_total1 = double())
-lap.plot <- ggplot()
+# Data frame for roi graph
 roi.data <- data.frame(school.n = character(), roi.n = factor())
+# Data frame to convert degree code to number of years for degree
+deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19)
+years <- c(1,2,2,3,4,1,2,1,3,1,2,1,1)
+num.years <- data.frame(deg.code, years)
 
 ui <- dashboardPage(
-  dashboardHeader(title = "College Planning"),
+  dashboardHeader(title = "E.P.I.C. Planning"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Home Page", tabName = "home", icon = icon("home")),
@@ -67,10 +70,10 @@ ui <- dashboardPage(
                                               "soc.cat"), choices = names(master1))
       ),
       tabItem(tabName = "instructions",
-              h2("Go through each tab and select the items you currently know about")
+              h2("Go through each tab and select the items you are certain about")
       ),
       tabItem(tabName = "school",
-              h3("I know exactly where I want to go:"),
+              h3("I know where I want to go:"),
               box(
                 width = 5,
                 selectInput(inputId = "pre.school.name",
@@ -242,9 +245,8 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output, session) {
+  
   #Reactive variable that uses selected choices or full column if empty
-  
-  
   school.name_var <- reactive({
     if(is.null(input$nvs.school.name )) {
       unique(master1$school.name)} else {
@@ -335,7 +337,7 @@ server <- function(input, output, session) {
     
     output$nvs.choice.table <- renderDataTable({
       DT::datatable(data = table_var()  %>% select(input$column.names), 
-                    options = list(pageLength = 10),selection = list(mode = "multiple"))
+                    options = list(pageLength = 10, filter = FALSE),selection = list(mode = "multiple"))
     })
   })
   #ObserveEvents go back here  
@@ -363,6 +365,7 @@ server <- function(input, output, session) {
   
   #choice Tables after choosing rows  
   observe ({
+    req(input$age.begin, input$career.length)
     if(nrow(new_var()) > 0) {
       output$row.choice.table1 <- renderUI({
         box(width = 4,
@@ -378,29 +381,7 @@ server <- function(input, output, session) {
             new_var()$InStOff[1])
       })
       dc <- new_var()$degree.code[1]
-      if (dc == 1){
-        years <- 1} else 
-          if (dc == 2) {
-            years <- 2} else 
-              if (dc == 3) {
-                years <- 2} else 
-                  if (dc == 5) {
-                    years <- 4} else 
-                      if (dc == 6) {
-                        years <- 1} else 
-                          if (dc == 7) {
-                            years <- 2} else 
-                              if (dc == 8) {
-                                years <- 1} else 
-                                  if (dc == 13) {
-                                    years <- 3} else 
-                                      if (dc == 14){
-                                        years <- 1} else 
-                                          if (dc == 17) {
-                                            years <- 2} else 
-                                              if (dc == 18) {
-                                                years <- 1}
-      
+      years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       y <- 0
       a <- input$age.begin
       for(i in (a:(a + (years - 1)))) {
@@ -446,9 +427,7 @@ server <- function(input, output, session) {
       })
       output$roi.plot <- renderPlot({
         ggplot(roi.data, aes(x=school.n, y = roi.n)) + geom_bar(stat = "identity", width = 0.4) +
-          xlab('School') +
-          ylab('Percent') +
-          labs(title = "ROI") +
+          xlab('School') + ylab('Percent') + labs(title = "ROI") +
           theme(plot.title = element_text(hjust = 0.5))
       })
     }
@@ -467,28 +446,7 @@ server <- function(input, output, session) {
             new_var()$InStOff[2])
       })
       dc <- new_var()$degree.code[2]
-      if (dc == 1){
-        years <- 1} else 
-          if (dc == 2) {
-            years <- 2} else 
-              if (dc == 3) {
-                years <- 2} else 
-                  if (dc == 5) {
-                    years <- 4} else 
-                      if (dc == 6) {
-                        years <- 1} else 
-                          if (dc == 7) {
-                            years <- 2} else 
-                              if (dc == 8) {
-                                years <- 1} else 
-                                  if (dc == 13) {
-                                    years <- 3} else 
-                                      if (dc == 14){
-                                        years <- 1} else 
-                                          if (dc == 17) {
-                                            years <- 2} else 
-                                              if (dc == 18) {
-                                                years <- 1}
+      years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       
       y <- 0
       a <- input$age.begin
@@ -560,29 +518,7 @@ server <- function(input, output, session) {
             new_var()$InStOff[3])
       })
       dc <- new_var()$degree.code[3]
-      if (dc == 1){
-        years <- 1} else 
-          if (dc == 2) {
-            years <- 2} else 
-              if (dc == 3) {
-                years <- 2} else 
-                  if (dc == 5) {
-                    years <- 4} else 
-                      if (dc == 6) {
-                        years <- 1} else 
-                          if (dc == 7) {
-                            years <- 2} else 
-                              if (dc == 8) {
-                                years <- 1} else 
-                                  if (dc == 13) {
-                                    years <- 3} else 
-                                      if (dc == 14){
-                                        years <- 1} else 
-                                          if (dc == 17) {
-                                            years <- 2} else 
-                                              if (dc == 18) {
-                                                years <- 1}
-      
+      years <- as.numeric (filter(num.years, deg.code %in% dc) %>% select(years))
       y <- 0
       a <- input$age.begin
       
