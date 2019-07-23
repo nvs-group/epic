@@ -193,9 +193,9 @@ ui <- dashboardPagePlus(
               box(
                 sliderInput(inputId = "pre.income",
                             label = NULL,
-                            value = min(sort(unique(master1$X10p))),
-                            min = min(sort(unique(master1$X10p))),
-                            max = max(sort(unique(master1$X10p))))
+                            value = min(sort(unique(master1$X17p))),
+                            min = min(sort(unique(master1$X17p))),
+                            max = max(sort(unique(master1$X17p))))
               )
       ),
       tabItem(tabName = "tuition",
@@ -269,9 +269,9 @@ ui <- dashboardPagePlus(
                     
                     sliderInput(inputId = "nvs.income",
                                 label = "Desired Income Level:",
-                                value = min(sort(unique(master1$X10p))),
-                                min = min(sort(unique(master1$X10p))),
-                                max = max(sort(unique(master1$X10p))))
+                                value = min(sort(unique(master1$X17p))),
+                                min = min(sort(unique(master1$X17p))),
+                                max = max(sort(unique(master1$X17p))))
                 ),
                 box(
                   width = 9,
@@ -388,9 +388,9 @@ server <- function(input, output, session) {
   table_var <- reactive({
     filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
            cip.cat %in% cip.cat_var(), cip.name %in% cip.name_var(), State %in% state_var(), occ.name %in% occ.name_var(),
-           soc.cat %in% occ.cat_var(), Experience %in% experience_var(), X10p >= input$nvs.income, entry.degree %in% entry.degree_var()) 
+           soc.cat %in% occ.cat_var(), Experience %in% experience_var(), X17p >= input$nvs.income, entry.degree %in% entry.degree_var()) 
   })
-  #X10p >= input$nvs.income, InStOff <= input$nvs.tuition,
+  #X17p >= input$nvs.income, InStOff <= input$nvs.tuition,
   observe ({
     req(cip_var())
     updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:", selected = cip_var())
