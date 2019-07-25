@@ -12,6 +12,7 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
+#rm(master1)
 master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
 #master1 <- read.csv("master1.csv", stringsAsFactors = F)
