@@ -14,7 +14,7 @@ selectedrowindex = 0
 #Read in main data table from your local directory
 #master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
-master1 <- read.csv("Master1.csv", stringsAsFactors = T)
+master1 <- read.csv("Master1.csv", stringsAsFactors = F)
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
@@ -35,8 +35,8 @@ salary3 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double
 # Data frame for roi graph
 roi.data <- data.frame(school.n = character(), roi.n = factor())
 # Data frame to convert degree code to number of years for degree
-deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19)
-years <- c(1,2,2,3,4,1,2,1,3,1,2,1,1)
+deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"")
+years <- c(1,2,2,3,4,1,2,1,3,1,2,1,1,1)
 num.years <- data.frame(deg.code, years)
 
 ui <- dashboardPagePlus(
@@ -110,9 +110,15 @@ ui <- dashboardPagePlus(
       ),
       tabItem(tabName = "tools",
               h2("This is where tools go."),
+              box(width = 4,
               checkboxGroupInput(inputId = "column.names", label = "Pick the columns you would like",
                                  selected = c("school.name", "X17p", "degree.name", "occ.name", "cip.name", "entry.degree",
-                                              "Experience", "InStOff"), choices = names(master1))
+                                              "Experience", "InStOff"), choices = names(master1))),
+              box(width = 4,
+              radioButtons(inputId = "unique.search",
+                           label = "Level of uniqueness",
+                           choices = c("Normal", "Curriculum", "Occupation", "School"),
+                           selected = "Normal"))
       ),
       tabItem(tabName = "instructions",
               h2("Click on your school and job preferences. If you really don't know, leave it blank")
@@ -385,12 +391,23 @@ server <- function(input, output, session) {
                         cip1$CIP_Category %in% input$survey.Cip_Category3 | cip1$CIP_Category %in% input$survey.Cip_Category4]
   })
   #Filter for First Table
-  table_var <- reactive({
+  table_var1 <- reactive({
     filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
            cip.cat %in% cip.cat_var(), cip.name %in% cip.name_var(), State %in% state_var(), occ.name %in% occ.name_var(),
-           soc.cat %in% occ.cat_var(), Experience %in% experience_var(), X17p >= input$nvs.income, entry.degree %in% entry.degree_var()) 
+           soc.cat %in% occ.cat_var(), Experience %in% experience_var(), X17p >= input$nvs.income, entry.degree %in% entry.degree_var())
+           })
+  
+  table_var <- reactive ({
+    if((input$unique.search) == 'School') {
+      table_var1() %>% distinct(table_var1()$school.name, .keep_all = TRUE)
+    } else if((input$unique.search) == 'Curriculum') { 
+        table_var1() %>% distinct(table_var1()$cip.name, .keep_all = TRUE)
+    } else if((input$unique.search) == 'Occupation') {
+        table_var1() %>% distinct(table_var1()$occ.name, .keep_all = TRUE)
+      } else {
+      table_var1()
+    }
   })
-  #X17p >= input$nvs.income, InStOff <= input$nvs.tuition,
   observe ({
     req(cip_var())
     updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:", selected = cip_var())
