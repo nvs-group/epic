@@ -12,13 +12,10 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
-master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
+#master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
-<<<<<<< HEAD
 #master1 <- read.csv("Master1.csv", stringsAsFactors = T)
-=======
-#master1 <- read.csv("Master1.csv", stringsAsFactors = F)
->>>>>>> 931cc78dec011e02fd08ede011ea749c9568c67e
+#master1 <- read.csv("Master1.csv")
 #Read cip data table and order alphabetically
 #cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
@@ -225,7 +222,7 @@ ui <- dashboardPagePlus(
                     
                     selectInput(inputId = "nvs.school.name",
                                 label= "School Name:",
-                                choices =  levels(master1$school.name),
+                                choices =  unique(master1$school.name),
                                 multiple = TRUE),
                     
                     selectInput(inputId = "nvs.degree.name",
@@ -269,12 +266,12 @@ ui <- dashboardPagePlus(
                     
                     selectInput(inputId = "nvs.entry.degree",
                                 label = "Rqd Entry Degree:",
-                                choices =  levels(master1$entry.degree),
+                                choices =  unique(master1$entry.degree),
                                 multiple = TRUE),
                     
                     selectInput(inputId = "nvs.experience",
                                 label = "Experience:",
-                                choices =  levels(master1$Experience),
+                                choices =  unique(master1$Experience),
                                 multiple = TRUE),
                     
                     sliderInput(inputId = "nvs.income",
