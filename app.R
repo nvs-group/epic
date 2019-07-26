@@ -12,9 +12,9 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
-master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
+#master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
-#master1 <- read.csv("master1.csv", stringsAsFactors = F)
+#master1 <- read.csv("Master1.csv", stringsAsFactors = T)
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
@@ -431,7 +431,7 @@ server <- function(input, output, session) {
     
     output$nvs.choice.table <- renderDataTable({
       DT::datatable(data = table_var()  %>% select(input$column.names), 
-                    options = list(pageLength = 8, filter = FALSE),selection = list(mode = "multiple"))
+                    options = list(pageLength = 10, filter = FALSE),selection = list(mode = "multiple"))
     })
   })
   #ObserveEvents go back here  
