@@ -14,12 +14,12 @@ selectedrowindex = 0
 #Read in main data table from your local directory
 #master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
-master1 <- read.csv("Master1.csv")
+#master1 <- read.csv("Master1.csv")
 #Read cip data table and order alphabetically
-cip2 <- read_tsv("cip_code.txt")
+#cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
 #Read soc data table and order alphabetically
-soc2 <- read_tsv("soc_code.txt")
+#soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #split soc into two groups
 soc_group1 <- (soc1$SOC_Cat_Name[1:12])
@@ -364,9 +364,9 @@ server <- function(input, output, session) {
   })
   #Reactive variable that uses selected choices or full column if empty 
   degree.name_var <- reactive({
-    if(is.null(input$nvs.degree.name )) {
+    if(is.null(input$pre.degree.name )) {
       unique(master1$degree.name)} else {
-        input$nvs.degree.name
+        input$pre.degree.name
       }
   })
   #Reactive variable that uses selected choices or full column if empty 
