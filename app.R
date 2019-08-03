@@ -12,9 +12,9 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
-#master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1")
+#master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
-master1 <- read.csv("master1.csv", stringsAsFactors = F)
+master1 <- read.csv("Master1.csv")
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
@@ -35,8 +35,8 @@ salary3 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double
 # Data frame for roi graph
 roi.data <- data.frame(school.n = character(), roi.n = factor())
 # Data frame to convert degree code to number of years for degree
-deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19)
-years <- c(1,2,2,3,4,1,2,1,3,1,2,1,1)
+deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"")
+years <- c(1,2,2,3,4,1,2,1,3,1,2,1,1,1)
 num.years <- data.frame(deg.code, years)
 
 ui <- dashboardPagePlus(
@@ -66,41 +66,81 @@ ui <- dashboardPagePlus(
   
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Home Page", tabName = "home", icon = icon("home")),
-      menuItem("My Profile", tabName = "profile", icon = icon("user"),
-               menuSubItem("Instructions", tabName = "instructions"),
-               menuSubItem("School Select", tabName = "school"),
-               menuSubItem("Degree Select", tabName = "degree"),
-               menuSubItem("Occupation Select", tabName = "occupation"),
-               menuSubItem("Curriculum Select", tabName = "curriculum"),
-               menuSubItem("Salary Select", tabName = "salary"),
-               menuSubItem("Tuition Select", tabName = "tuition")),
-      menuItem("Scenerios", tabName = "Scenerios", icon = icon("tasks"),
-               menuSubItem("Build Basic Scenerios", tabName = "buildbasic"),
-               menuSubItem("Compare Scenerios", tabName = "compare")),
+      menuItem("Home Page", tabName = "home",
+               menuSubItem("Instructions", tabName = "instructions")),
+      #      menuItem("My Lifestyle Stuff", tabName = "life profile", icon = icon("user"),
+      #               menuSubItem("Household Structure", tabName = "household"),
+      #               menuSubItem("One or more incomes?", tabName = "incomes"),
+      #               menuSubItem("Kids or no kids?", tabName = "kids"),
+      #               menuSubItem("Rich (new), Average (used), Poor (free)?", tabName = "class")),
+      menuItem("Go Exploring", tabName = "buildbasic", icon = icon("tasks")),
+      menuItem("Advanced Options", tabName = "advanced", icon = icon("user"),
+               menuSubItem("Experience Required", tabName = "experience"),
+               menuSubItem("State", tabName = "state"),
+               menuSubItem("School Degree", tabName = "degree")),
+#               menuSubItem("School Select", tabName = "school"),
+#               menuSubItem("Curriculum Select", tabName = "curriculum"),
+#               menuSubItem("Annual Total Cost", tabName = "tuition")),
+#      menuItem("My Job Stuff", tabName = "occ profile", icon = icon("user"),
+#               menuSubItem("Occupation Select", tabName = "occupation"),
+#               menuSubItem("Entry level degree", tabName = "entrydegree"),
+#               menuSubItem("Experience Required", tabName = "experience"),
+#               menuSubItem("Desired Income", tabName = "salary")),
+      #      menuItem("My Peers", tabName = "peers", icon = icon("user"),
+      #               menuSubItem("Similar lifestyle", tabName = "peer life"),
+      #               menuSubItem("Similar schooling", tabName = "peer school"),
+      #               menuSubItem("Similar job", tabName = "peer job"),
+      #               menuSubItem("Best match", tabName = "peer match")),
+     menuItem("Compare Scenarios:", tabName = "compare", icon = icon("tasks")),
       menuItem("Tools", tabName = "tools", icon = icon("toolbox")),
       menuItem("About", tabName = "about", icon = icon("info"))
     )
   ),
+  # This section defines how the menu tabs function when selected. If the tabs are not defined or are not
+  # selected, no action takes place and the menus are not displayed.
+  
   dashboardBody(
     tabItems(
+      tabItem(tabName = "home",
+              h2("Welcome to EPIC, the Education-Profession Investment Calculator")
+      ),
       tabItem(tabName = "profile",
               h2("Thanks")
       ),
       tabItem(tabName = "about",
-              h2("Welcome and Hello")
+              h2("Hello and Welcome to your EPIC experience"),
+              h2("Test drive the world's first fully 
+                 integrated"),
+              h2("Education-Profession Investment Calculator")
       ),
       tabItem(tabName = "tools",
               h2("This is where tools go."),
-              checkboxGroupInput(inputId = "column.names", label = "Pick the columns you would like",
-                                 selected = c("school.name", "degree.name", "occ.name", "cip.name", "entry.degree",
-                                              "Experience", "InStOff", "IGrant.Avg", "X17p", "X50p"), choices = names(master1))
+              box(width = 4,
+                  checkboxGroupInput(inputId = "column.names", label = "Pick the columns you would like",
+                                     selected = c("school.name", "X17p", "degree.name", "occ.name", "cip.name", "entry.degree",
+                                                  "Experience", "InStOff"), choices = names(master1))),
+              box(width = 4,
+                  radioButtons(inputId = "RecordsNum",
+                               label = "Number of records per page",
+                               choices = c(10, 20, 50, 100),
+                               selected = 10)),
+              box(width = 4,
+                  radioButtons(inputId = "unique.search",
+                               label = "Level of uniqueness",
+                               choices = c("Normal", "Curriculum", "Occupation", "School"),
+                               selected = "Normal")),
+              box(width = 4,
+                  h4("Explore career occupations: https://www.onetonline.org/"),
+                  h4("Explore schools: https://collegescorecard.ed.gov/"),
+                  h4("Skills assessment: https://www.careeronestop.org/"),
+                  h4("Advanced Skills assessment: https://www.wowi.com/"),
+                  h4("What do you want to do for a living? https://www.mynextmove.org/"))
       ),
       tabItem(tabName = "instructions",
-              h2("Go through each tab and select the items you are certain about")
+              h2("Click on your school and job preferences. If you really don't know, leave it blank")
       ),
       tabItem(tabName = "school",
-              h3("I know where I want to go:"),
+              h3("I would consider these schools:"),
               box(
                 width = 5,
                 selectInput(inputId = "pre.school.name",
@@ -110,7 +150,7 @@ ui <- dashboardPagePlus(
               )
       ),
       tabItem(tabName = "degree",
-              h3("What is the highest degree you are planning to get?"),
+              h3("I want to get this degree and then get a job"),
               box(
                 width = 5,
                 selectInput(inputId = "pre.degree.name",
@@ -119,23 +159,53 @@ ui <- dashboardPagePlus(
                             multiple = TRUE)
               )
       ),
+      tabItem(tabName = "entrydegree",
+              h3("My occupation requires at least this degree level"),
+              box(
+                width = 5,
+                selectInput(inputId = "pre.entry.degree",
+                            label = NULL,
+                            choices = levels(master1$entry.degree),
+                            multiple = TRUE)
+              )
+      ),
+      tabItem(tabName = "experience",
+              h3("I need this much work experience to get this job"),
+              box(
+                width = 5,
+                selectInput(inputId = "pre.experience",
+                            label = NULL,
+                            choices = levels(master1$Experience),
+                            multiple = TRUE)
+              )
+      ),
+      tabItem(tabName = "state",
+              h3("I would consider schools in these states:"),
+              box(
+                width = 5,
+                selectInput(inputId = "pre.state",
+                            label = NULL,
+                            choices = levels(master1$State),
+                            multiple = TRUE)
+              )
+      ),
       tabItem(tabName = "occupation",
-              h3("Which of these occupations would you consider?"),
-              
+              h3("I would consider jobs in these areas"),
               fluidRow(
                 box(
                   width = 4,
                   checkboxGroupInput(inputId = "pre.occupation1",
                                      label = NULL,
                                      choices = soc_group1)),
-                box(width = 4,
-                    checkboxGroupInput(inputId = "pre.occupation2",
-                                       label = NULL,
-                                       choices = soc_group2))
+                box(
+                  width = 4,
+                  checkboxGroupInput(inputId = "pre.occupation2",
+                                     label = NULL,
+                                     choices = soc_group2))
               )
       ),
       tabItem(tabName = "curriculum",
-              h3("Please check all curriculum that you are interested in"),
+              h3("I would consider studying these areas"),
               fluidRow(
                 box(width = 3,
                     checkboxGroupInput(inputId = "survey.Cip_Category1",
@@ -160,78 +230,98 @@ ui <- dashboardPagePlus(
               )
       ),
       tabItem(tabName = "salary",
-              h3("How much income would you like to make in 10 to 15 years?"),
+              h3("I would like to make at least this amount when I get out of school"),
               box(
                 sliderInput(inputId = "pre.income",
                             label = NULL,
-                            value = min(sort(unique(master1$X10p))),
-                            min = min(sort(unique(master1$X10p))),
-                            max = max(sort(unique(master1$X10p))))
+                            value = min(sort(unique(master1$X17p))),
+                            min = min(sort(unique(master1$X17p))),
+                            max = max(sort(unique(master1$X17p))))
               )
       ),
-      tabItem(tabName = "tuition",
-              h3("How much tuition would you like to pay per years?"),
-              box(
-                sliderInput(inputId = "pre.tuition",
-                            label = NULL,
-                            value = max(sort(unique(master1$InStOff))),
-                            min = min(sort(unique(master1$InStOff))),
-                            max = max(sort(unique(master1$InStOff))))
-              )
-      ),
+#      tabItem(tabName = "tuition",
+#              h3("I don't want to spend more than this amount per year for school"),
+#              box(
+#                sliderInput(inputId = "pre.tuition",
+#                            label = NULL,
+#                            value = max(sort(unique(master1$InStOff))),
+#                            min = min(sort(unique(master1$InStOff))),
+#                            step = 1000,
+#                            max = max(sort(unique(master1$InStOff))))
+#              )
+#      ),
       tabItem(tabName = "buildbasic",
               fluidRow(
-                box(width = 3,
-                    
+                box(width = 2,
+                    sliderInput(inputId = "nvs.income",
+                                label = "Starting Salary:",
+                                value = min(sort(unique(master1$X17p))),
+                                min = min(sort(unique(master1$X17p))),
+                                step = 1000,
+                                max = max(sort(unique(master1$X17p))))),
+                box(width = 2,
+                    selectInput(inputId = "nvs.entry.degree",
+                                label = "Years in school:",
+                                choices =  levels(master1$entry.degree),
+                                multiple = TRUE)),
+                box(width = 2,
                     selectInput(inputId = "nvs.school.name",
                                 label= "School Name:",
                                 choices =  levels(master1$school.name),
-                                multiple = TRUE),
-                    
-                    selectInput(inputId = "nvs.degree.name",
-                                label = "Degree Name:",
-                                choices =  levels(master1$degree.name),
-                                multiple = TRUE),
-                    
-                    selectInput(inputId = "nvs.cip.cat",
-                                label = "Curriculum Category:",
-                                choices = cip1$CIP_Category,
-                                multiple = TRUE),
-                    
+                                multiple = TRUE)),
+                box(width = 2,
+                    selectInput(inputId = "nvs.occ.name",
+                                label = "Job Title:",
+                                choices = levels(master1$occ.name),
+                                multiple = TRUE)),
+                box(width = 2,
+                    sliderInput(inputId = "nvs.tuition",
+                                label = "Max yearly Ed cost",
+                                value = max(sort(unique(master1$InStOff))),
+                                min = min(sort(unique(master1$InStOff))),
+                                step = 1000,
+                                max = max(sort(unique(master1$InStOff))))),
+                box(width = 2,
                     selectInput(inputId = "nvs.cip.name",
                                 label = "Curriculum Name:",
                                 choices = levels(master1$cip.name),
-                                multiple = TRUE),
-                    
-                    selectInput(inputId = "nvs.occ.cat",
-                                label = "Occupation Category:",
-                                choices = soc1$SOC_Cat_Name,
-                                multiple = TRUE),
-                    
-                    selectInput(inputId = "nvs.occ.name",
-                                label = "Occupation Name:",
-                                choices = levels(master1$occ.name),
-                                multiple = TRUE),
-                    
-                    sliderInput(inputId = "nvs.income",
-                                label = "Desired Income Level:",
-                                value = min(sort(unique(master1$X10p))),
-                                min = min(sort(unique(master1$X10p))),
-                                max = max(sort(unique(master1$X10p)))),
-                    
-                    sliderInput(inputId = "nvs.tuition",
-                                label = "Desired Tuition Level",
-                                value = max(sort(unique(master1$InStOff))),
-                                min = min(sort(unique(master1$InStOff))),
-                                max = max(sort(unique(master1$InStOff))))
-                ),
+                                multiple = TRUE)),
+#                    selectInput(inputId = "nvs.degree.name",
+#                                label = "Degree Name:",
+#                                choices =  levels(master1$degree.name),
+#                                multiple = TRUE)),
+#                box(width = 2,
+#                    selectInput(inputId = "nvs.cip.cat",
+#                                label = "Curriculum Category:",
+#                                choices = cip1$CIP_Category,
+#                                multiple = TRUE),
+#                    
+#                    ),
+#                    h3("Job"),
+#                    selectInput(inputId = "nvs.occ.cat",
+#                                label = "Occupation Category:",
+#                                choices = soc1$SOC_Cat_Name,
+#                                multiple = TRUE),
+#                    
+#                    selectInput(inputId = "nvs.experience",
+#                                label = "Experience:",
+#                                choices =  levels(master1$Experience),
+#                                multiple = TRUE),
+#                    selectInput(inputId = "nvs.entry.degree",
+#                                label = "Rqd Entry Degree:",
+#                                choices =  levels(master1$entry.degree),
+#                                multiple = TRUE),
+#                    selectInput(inputId = "nvs.state",
+#                                label = "State:",
+#                                choices = levels(master1$State),
+#                                multiple = TRUE),
+#                    ),
                 box(
-                  width = 9,
+                  width = 12,
                   div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "nvs.choice.table"))
                 )
               )
       ),
-      
       tabItem(tabName = "compare",
               fluidRow(
                 uiOutput(outputId = "tenure.select")
@@ -263,11 +353,8 @@ ui <- dashboardPagePlus(
               )
       )
     )
-  )
-)
-
+  ))
 server <- function(input, output, session) {
-  
   #Reactive variable that uses selected choices or full column if empty
   school.name_var <- reactive({
     if(is.null(input$nvs.school.name )) {
@@ -282,11 +369,32 @@ server <- function(input, output, session) {
         input$nvs.degree.name
       }
   })
+  #Reactive variable that uses selected choices or full column if empty 
+  state_var <- reactive({
+    if(is.null(input$pre.state)) {
+      unique(master1$State)} else {
+        input$pre.state
+      }
+  })
+  #Reactive variable that uses selected choices or full column if empty 
+  experience_var <- reactive({
+    if(is.null(input$pre.experience)) {
+      unique(master1$Experience)} else {
+        input$pre.experience
+      }
+  })
   #Reactive variable that uses selected choices or full column if empty
   occ.name_var <- reactive({
     if(is.null(input$nvs.occ.name)) {
       unique(master1$occ.name)} else {
         input$nvs.occ.name
+      }
+  })  
+  #Reactive variable that uses selected choices or full column if empty
+  entry.degree_var <- reactive({
+    if(is.null(input$nvs.entry.degree)) {
+      unique(master1$entry.degree)} else {
+        input$nvs.entry.degree
       }
   })  
   #Reactive variable that uses selected choices or full column if empty
@@ -316,12 +424,23 @@ server <- function(input, output, session) {
                         cip1$CIP_Category %in% input$survey.Cip_Category3 | cip1$CIP_Category %in% input$survey.Cip_Category4]
   })
   #Filter for First Table
-  table_var <- reactive({
+  table_var1 <- reactive({
     filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
-           occ.name %in% occ.name_var(), cip.name %in% cip.name_var(),
-           cip.cat %in% cip.cat_var(), soc.cat %in% occ.cat_var()) 
+           cip.cat %in% cip.cat_var(), cip.name %in% cip.name_var(), State %in% state_var(), occ.name %in% occ.name_var(),
+           soc.cat %in% occ.cat_var(), Experience %in% experience_var(), InStOff <= input$nvs.tuition, X17p >= input$nvs.income, entry.degree %in% entry.degree_var())
   })
-  #X10p >= input$nvs.income, InStOff <= input$nvs.tuition,
+  
+  table_var <- reactive ({
+    if((input$unique.search) == 'School') {
+      table_var1() %>% distinct(table_var1()$school.name, .keep_all = TRUE)
+    } else if((input$unique.search) == 'Curriculum') { 
+      table_var1() %>% distinct(table_var1()$cip.name, .keep_all = TRUE)
+    } else if((input$unique.search) == 'Occupation') {
+      table_var1() %>% distinct(table_var1()$occ.name, .keep_all = TRUE)
+    } else {
+      table_var1()
+    }
+  })
   observe ({
     req(cip_var())
     updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:", selected = cip_var())
@@ -336,6 +455,9 @@ server <- function(input, output, session) {
     }
     if(is.null(input$nvs.degree.name)) {
       updateSelectInput(session, "nvs.degree.name", "Degree Name:", choices = unique(table_var()$degree.name))
+    }
+    if(is.null(input$nvs.state)) {
+      updateSelectInput(session, "nvs.state", "State:", choices = unique(table_var()$State))
     }
     if(is.null(input$nvs.occ.name)) {
       updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
@@ -359,10 +481,11 @@ server <- function(input, output, session) {
     
     output$nvs.choice.table <- renderDataTable({
       DT::datatable(data = table_var()  %>% select(input$column.names), 
-                    options = list(pageLength = 10, filter = FALSE),selection = list(mode = "multiple"))
+                    options = list(pageLength = input$RecordsNum, filter = TRUE),selection = list(mode = "multiple"))
     })
   })
   #ObserveEvents go back here  
+  # This is where the first preferences get loaded intot he Basic Search menus
   # from school choice on preference page  
   observeEvent(input$pre.school.name, {
     updateSelectInput(session, "nvs.school.name", "School Name:", selected = input$pre.school.name)
@@ -371,13 +494,25 @@ server <- function(input, output, session) {
   observeEvent(input$pre.degree.name, {
     updateSelectInput(session, "nvs.degree.name", "Degree Name:", selected = input$pre.degree.name)
   })
+  #Import degree choice to scenerio from degree choice on preference page  
+  observeEvent(input$pre.state, {
+    updateSelectInput(session, "nvs.state", "State:", selected = input$pre.state)
+  })
   # from income level choice on preference page  
   observeEvent(input$pre.income, {
-    updateSliderInput(session, "nvs.income", "Desired Income Level:", value = input$pre.income)
+    updateSliderInput(session, "nvs.income", "Min starting salary:", value = input$pre.income)
+  })
+  # from income level choice on preference page  
+  observeEvent(input$pre.experience, {
+    updateSliderInput(session, "nvs.experience", "Required experience:", value = input$pre.experience)
+  })
+  # from income level choice on preference page  
+  observeEvent(input$pre.entry.degree, {
+    updateSliderInput(session, "nvs.entry.degree", "Required entry degree:", value = input$pre.entry.degree)
   })
   # from tuition cost level choice on preference page  
   observeEvent(input$pre.tuition, {
-    updateSliderInput(session, "nvs.tuition", "Desired Tuition Level:", value = input$pre.tuition)
+    updateSliderInput(session, "nvs.tuition", "Max yrly Ed costs:", value = input$pre.tuition)
   })
   #Table prep with filters and Column choices for second table
   new_var <- reactive({
@@ -406,7 +541,7 @@ server <- function(input, output, session) {
       )
     })
   })
-  #choice Tables after choosing rows  
+  #choice Cards after selecting scenarios from table 1  
   observe ({
     req(input$age.begin, input$career.length)
     if(nrow(new_var()) > 0) {
@@ -416,6 +551,8 @@ server <- function(input, output, session) {
             new_var()$occ.name[1], br(),
             strong("School :"), 
             new_var()$school.name[1], br(),
+            strong("Curriculum :"), 
+            new_var()$cip.name[1], br(),
             strong("Degree :"), 
             new_var()$degree.name[1], br(),
             strong("Salary :"), 
@@ -452,10 +589,10 @@ server <- function(input, output, session) {
       r1 <- list(school.n = paste("1",new_var()$school.name[1], "\n", new_var()$occ.name[1]), roi.n = roi1)
       roi.data <- rbind(roi.data, r1)
       
-      output$row.choice.wage1 <- renderDataTable({
-        DT::datatable(data = salary1, options = list(pageLength = 10, searching = FALSE, ordering = FALSE),
-                      selection = "none")
-      })
+#      output$row.choice.wage1 <- renderDataTable({
+#        DT::datatable(data = salary1, options = list(pageLength = 10, searching = FALSE, ordering = FALSE),
+#                      selection = "none")
+#      })
       output$cummulative.plot <- renderPlot({
         ggplot() + geom_line(data = salary1, aes(x = age1 ,y = run_total1/1000, colour="First"),
                              show.legend = TRUE) +
@@ -479,6 +616,8 @@ server <- function(input, output, session) {
             new_var()$occ.name[2], br(),
             strong("School :"), 
             new_var()$school.name[2], br(),
+            strong("Curriculum :"), 
+            new_var()$cip.name[2], br(),
             strong("Degree :"), 
             new_var()$degree.name[2], br(),
             strong("Salary :"), 
@@ -515,10 +654,10 @@ server <- function(input, output, session) {
       r2 <- list(school.n = paste("2", new_var()$school.name[2], "\n", new_var()$occ.name[2]), roi.n = roi2)
       roi.data <- rbind(roi.data, data.frame(as.list(r2)))
       
-      output$row.choice.wage2 <- renderDataTable({
-        DT::datatable(data = salary2, options = list(pageLength = 10, searching = FALSE, ordering = FALSE),
-                      selection = "none")
-      })
+      #      output$row.choice.wage2 <- renderDataTable({
+      #        DT::datatable(data = salary2, options = list(pageLength = 10, searching = FALSE, ordering = FALSE),
+      #                      selection = "none")
+      #      })
       
       output$cummulative.plot <- renderPlot({
         ggplot() + geom_line(data = salary1, aes(x = age1 ,y = run_total1/1000, colour = "First"),
@@ -547,6 +686,8 @@ server <- function(input, output, session) {
             new_var()$occ.name[3], br(),
             strong("School :"), 
             new_var()$school.name[3], br(),
+            strong("Curriculum :"), 
+            new_var()$cip.name[3], br(),
             strong("Degree :"), 
             new_var()$degree.name[3], br(),
             strong("Salary :"), 
@@ -583,10 +724,10 @@ server <- function(input, output, session) {
       r3 <- list(school.n = paste("3", new_var()$school.name[3], "\n", new_var()$occ.name[3]), roi.n = roi3)
       roi.data <- rbind(roi.data, data.frame(as.list(r3)))
       
-      output$row.choice.wage3 <- renderDataTable({
-        DT::datatable(data = salary3, options = list(pageLength = 10, searching = FALSE, ordering = FALSE),
-                      selection = "none")
-      })
+      #      output$row.choice.wage3 <- renderDataTable({
+      #        DT::datatable(data = salary3, options = list(pageLength = 10, searching = FALSE, ordering = FALSE),
+      #                      selection = "none")
+      #      })
       output$cummulative.plot <- renderPlot({
         ggplot() + geom_line(data = salary1, aes(x = age1 ,y = run_total1/1000, colour = "First"),
                              show.legend = TRUE) +
