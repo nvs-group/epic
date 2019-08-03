@@ -267,6 +267,10 @@ ui <- dashboardPagePlus(
                     selectInput(inputId = "nvs.school.name",
                                 label= "School Name:",
                                 choices =  levels(master1$school.name),
+                                multiple = TRUE),
+                    selectInput(inputId = "nvs.state",
+                                label = "State:",
+                                choices = levels(master1$State),
                                 multiple = TRUE)),
                 box(width = 2,
                     selectInput(inputId = "nvs.occ.name",
@@ -309,10 +313,6 @@ ui <- dashboardPagePlus(
 #                    selectInput(inputId = "nvs.entry.degree",
 #                                label = "Rqd Entry Degree:",
 #                                choices =  levels(master1$entry.degree),
-#                                multiple = TRUE),
-#                    selectInput(inputId = "nvs.state",
-#                                label = "State:",
-#                                choices = levels(master1$State),
 #                                multiple = TRUE),
 #                    ),
                 box(
@@ -370,9 +370,9 @@ server <- function(input, output, session) {
   })
   #Reactive variable that uses selected choices or full column if empty 
   state_var <- reactive({
-    if(is.null(input$pre.state)) {
+    if(is.null(input$nvs.state)) {
       unique(master1$State)} else {
-        input$pre.state
+        input$nvs.state
       }
   })
   #Reactive variable that uses selected choices or full column if empty 
