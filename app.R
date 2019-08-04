@@ -23,7 +23,6 @@ cip1 <- cip2[order(cip2$CIP_Category),]
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #Read the degree crosswalk table for rqrd degree and school degree
 degreecw <- read_csv("DegreeCrosswalk.csv")
-
 #split soc into two groups
 soc_group1 <- (soc1$SOC_Cat_Name[1:12])
 soc_group2 <- (soc1$SOC_Cat_Name[13:24])
