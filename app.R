@@ -21,6 +21,9 @@ cip1 <- cip2[order(cip2$CIP_Category),]
 #Read soc data table and order alphabetically
 #soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
+#Read the degree crosswalk table for rqrd degree and school degree
+degreecw <- read_csv("DegreeCrosswalk.csv")
+
 #split soc into two groups
 soc_group1 <- (soc1$SOC_Cat_Name[1:12])
 soc_group2 <- (soc1$SOC_Cat_Name[13:24])
@@ -116,7 +119,7 @@ ui <- dashboardPagePlus(
               h2("This is where tools go."),
               box(width = 4,
                   checkboxGroupInput(inputId = "column.names", label = "Pick the columns you would like",
-                                     selected = c("school.name", "X17p", "degree.name", "occ.name", "cip.name", "entry.degree",
+                                     selected = c("school.name", "X17p", "occ.name", "cip.name", "entry.degree",
                                                   "Experience", "InStOff"), choices = names(master1))),
               box(width = 4,
                   radioButtons(inputId = "RecordsNum",
@@ -259,8 +262,12 @@ ui <- dashboardPagePlus(
                                 step = 1000,
                                 max = max(sort(unique(master1$X17p))))),
                 box(width = 2,
+                    selectInput(inputId = "nvs.entry.degree",
+                                label = "Entry Degree:",
+                                choices =  levels(master1$entry.degree),
+                                multiple = TRUE),
                     selectInput(inputId = "nvs.degree.name",
-                                label = "Years in school:",
+                                label = "School Degree:",
                                 choices =  levels(master1$degree.name),
                                 multiple = TRUE)),
                 box(width = 2,
@@ -289,10 +296,6 @@ ui <- dashboardPagePlus(
                                 label = "Curriculum Name:",
                                 choices = levels(master1$cip.name),
                                 multiple = TRUE)),
-#                    selectInput(inputId = "nvs.degree.name",
-#                                label = "Degree Name:",
-#                                choices =  levels(master1$degree.name),
-#                                multiple = TRUE)),
 #                box(width = 2,
 #                    selectInput(inputId = "nvs.cip.cat",
 #                                label = "Curriculum Category:",
@@ -391,9 +394,9 @@ server <- function(input, output, session) {
   })  
   #Reactive variable that uses selected choices or full column if empty
   entry.degree_var <- reactive({
-    if(is.null(input$pre.entry.degree)) {
+    if(is.null(input$nvs.entry.degree)) {
       unique(master1$entry.degree)} else {
-        input$pre.entry.degree
+        input$nvs.entry.degree
       }
   })  
   #Reactive variable that uses selected choices or full column if empty
