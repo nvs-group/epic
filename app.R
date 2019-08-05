@@ -45,26 +45,27 @@ ui <- dashboardPagePlus(
   header = dashboardHeaderPlus(
     title = "E.P.I.C. Planning", titleWidth = 230,
     left_menu = tagList(
-      dropdownBlock(
-        id = "scenerio",
-        title = "Scenerios",
-        icon = "list",
-        radioButtons(
-          inputId = "scenerio_level",
-          label = "Level of Scenerio",
-          choices = c("Basic" = "basic",
-                      "Advanced" = "advanced"))),
+#      dropdownBlock(
+#        id = "scenerio",
+#        title = "Scenerios",
+#        icon = "list",
+#        radioButtons(
+#          inputId = "scenerio_level",
+#          label = "Level of Scenerio",
+#          choices = c("Basic" = "basic",
+#                      "Advanced" = "advanced"))),
       
       dropdownBlock(
         id = "competency",
-        title = "Competency",
+        title = "Future Enhancements",
         icon = "list",
         radioButtons(
           inputId = "competency_level",
           label = "Competency",
           choices = c("Low" = "low_comp", "Average" = "ave_comp", "High" = "hi_comp"),
           selected = "ave_comp"
-        )))),
+        ))
+      )),
   
   dashboardSidebar(
     sidebarMenu(
@@ -177,6 +178,7 @@ ui <- dashboardPagePlus(
                 selectInput(inputId = "pre.experience",
                             label = NULL,
                             choices = levels(master1$Experience),
+                            selected = "None",
                             multiple = TRUE)
               )
       ),
@@ -308,10 +310,6 @@ ui <- dashboardPagePlus(
 #                                choices = soc1$SOC_Cat_Name,
 #                                multiple = TRUE),
 #                    
-#                    selectInput(inputId = "nvs.experience",
-#                                label = "Experience:",
-#                                choices =  levels(master1$Experience),
-#                                multiple = TRUE),
 #                    selectInput(inputId = "nvs.entry.degree",
 #                                label = "Rqd Entry Degree:",
 #                                choices =  levels(master1$entry.degree),
@@ -379,9 +377,9 @@ server <- function(input, output, session) {
   })
   #Reactive variable that uses selected choices or full column if empty 
   experience_var <- reactive({
-    if(is.null(input$pre.experience)) {
+    if(is.null(input$nvs.experience)) {
       unique(master1$Experience)} else {
-        input$pre.experience
+        input$nvs.experience
       }
   })
   #Reactive variable that uses selected choices or full column if empty
