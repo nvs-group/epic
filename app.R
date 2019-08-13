@@ -36,7 +36,7 @@ salary3 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double
 roi.data <- data.frame(school.n = character(), roi.n = factor())
 # Data frame to convert degree code to number of years for degree
 deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"")
-years <- c(1,2,2,3,4,1,2,1,3,1,2,1,1,1)
+years <- c(.8,1.5,2,3,4,5,6,7,3,5,10,7,8,1)
 num.years <- data.frame(deg.code, years)
 
 ui <- dashboardPagePlus(
@@ -583,7 +583,7 @@ server <- function(input, output, session) {
     })
   })
   #ObserveEvents go back here  
-  # This is where the first preferences get loaded intot he Basic Search menus
+  # This is where the first preferences get loaded into the Basic Search menus
   # from school choice on preference page  
   observeEvent(input$pre.school.name, {
     updateSelectInput(session, "nvs.school.name", "School Name:", selected = input$pre.school.name)
