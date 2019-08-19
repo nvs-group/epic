@@ -1,6 +1,5 @@
-
 SOC_Code	SOC_Cat_Name
-N/A	N/A
+00	None
 11	Management Occupations
 13	Business and Financial Operations Occupations
 15	Computer and Mathematical Occupations

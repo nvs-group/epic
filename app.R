@@ -73,26 +73,28 @@ ui <- dashboardPagePlus(
       #               menuSubItem("One or more incomes?", tabName = "incomes"),
       #               menuSubItem("Kids or no kids?", tabName = "kids"),
       #               menuSubItem("Rich (new), Average (used), Poor (free)?", tabName = "class")),
-      menuItem("My School Stuff", tabName = "ed profile", icon = icon("user"),
-               menuSubItem("Explore Schools", tabName = "exploreschools"),
-               menuSubItem("School Select", tabName = "school"),
-               menuSubItem("Curriculum Select", tabName = "curriculum"),
-               menuSubItem("Degree Select", tabName = "degree"),
-               menuSubItem("Annual Total Cost", tabName = "tuition"),
-               menuSubItem("State", tabName = "state")),
-      menuItem("My Job Stuff", tabName = "occ profile", icon = icon("user"),
-               menuSubItem("Explore Jobs", tabName = "explorejobs"),
-               menuSubItem("Occupation Select", tabName = "occupation"),
-               menuSubItem("Entry level degree", tabName = "entrydegree"),
-               menuSubItem("Experience Required", tabName = "experience"),
-               menuSubItem("Desired Income", tabName = "salary")),
+      menuItem("Explore Schools", tabName = "exploreschools", icon = icon("user")),
+#               menuItem("My School Stuff", tabName = "ed profile", icon = icon("user"),
+#               menuSubItem("Explore Schools", tabName = "exploreschools"),
+#               menuSubItem("School Select", tabName = "school"),
+#               menuSubItem("Curriculum Select", tabName = "curriculum"),
+#               menuSubItem("Degree Select", tabName = "degree"),
+#               menuSubItem("Annual Total Cost", tabName = "tuition"),
+#               menuSubItem("State", tabName = "state")),
+      menuItem("Explore Jobs", tabName = "explorejobs", icon = icon("user")),
+#              menuItem("My Job Stuff", tabName = "occ profile", icon = icon("user"),
+#               menuSubItem("Explore Jobs", tabName = "explorejobs"),
+#               menuSubItem("Occupation Select", tabName = "occupation"),
+#               menuSubItem("Entry level degree", tabName = "entrydegree"),
+#               menuSubItem("Experience Required", tabName = "experience"),
+#               menuSubItem("Desired Income", tabName = "salary")),
       #      menuItem("My Peers", tabName = "peers", icon = icon("user"),
       #               menuSubItem("Similar lifestyle", tabName = "peer life"),
       #               menuSubItem("Similar schooling", tabName = "peer school"),
       #               menuSubItem("Similar job", tabName = "peer job"),
       #               menuSubItem("Best match", tabName = "peer match")),
-      menuItem("Build Scenerios", tabName = "buildbasic", icon = icon("tasks")),
-      menuItem("Compare Scenarios:", tabName = "compare", icon = icon("tasks")),
+      menuItem("Select Scenerios", tabName = "buildbasic", icon = icon("tasks")),
+      menuItem("Compare Scenarios", tabName = "compare", icon = icon("tasks")),
       menuItem("Tools", tabName = "tools", icon = icon("toolbox")),
       menuItem("About", tabName = "about", icon = icon("info"))
     )
@@ -133,7 +135,7 @@ ui <- dashboardPagePlus(
                   h4("Advanced Skills assessment: https://www.wowi.com/"),
                   h4("What do you want to do for a living? https://www.mynextmove.org/")),
               box(width = 4,
-                  checkboxGroupInput(inputId = "column.names", label = "Pick the scenario columns you would like",
+                  checkboxGroupInput(inputId = "basic.column.names", label = "Pick the scenario columns you would like",
                                      selected = c("school.name", "X17p", "degree.name", "occ.name", "cip.name", "entry.degree",
                                                   "Experience", "InStOff"), choices = names(master1))),
               box(width = 4,
@@ -141,8 +143,8 @@ ui <- dashboardPagePlus(
                                      selected = c("X17p", "X50p", "X82p", "occ.name", "entry.degree",
                                                   "Experience"), choices = names(master1))),
               box(width = 4,
-                  checkboxGroupInput(inputId = "schools.column.names", label = "Pick the schoool columns you would like",
-                                     selected = c("school.name", "InStOff", "Ouston", "OuStOff",
+                  checkboxGroupInput(inputId = "schools.column.names", label = "Pick the school columns you would like",
+                                     selected = c("school.name", "State", "InStOff", "Ouston", "OuStOff",
                                                    "IGrant.Avg", "IGrant..age"), choices = names(master1)))
       ),
       tabItem(tabName = "instructions",
@@ -309,6 +311,7 @@ ui <- dashboardPagePlus(
                                 label = "Desired Income Level:",
                                 value = min(sort(unique(master1$X17p))),
                                 min = min(sort(unique(master1$X17p))),
+                                step = 1000,
                                 max = max(sort(unique(master1$X17p))))),
                 box(width = 3,
                     selectInput(inputId = "nvs.occ.cat",
@@ -578,7 +581,7 @@ server <- function(input, output, session) {
   #First Table
   observe ( {  
     output$nvs.choice.table <- renderDataTable({
-      DT::datatable(data = table_var()  %>% select(input$column.names), 
+      DT::datatable(data = table_var()  %>% select(input$basic.column.names), 
                     options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "multiple"))
     })
   })
@@ -616,7 +619,7 @@ server <- function(input, output, session) {
   new_var <- reactive({
     table_var()[input$nvs.choice.table_rows_selected,]
     # %>% select(occ.name, school.name, degree.name, X17p, InStOff, degree.code)
-    #    table_var() %>% select(input$column.names)
+    #    table_var() %>% select(input$basic.column.names)
   })
   observe({
     req(input$scenerio_level == "basic")
