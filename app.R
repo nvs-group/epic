@@ -14,12 +14,12 @@ selectedrowindex = 0
 #Read in main data table from your local directory
 #master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
-master1 <- read.csv("Master1.csv")
+#master1 <- read.csv("Master1.csv")
 #Read cip data table and order alphabetically
-cip2 <- read_tsv("cip_code.txt")
+#cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
 #Read soc data table and order alphabetically
-soc2 <- read_tsv("soc_code.txt")
+#soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #split soc into two groups
 soc_group1 <- (soc1$SOC_Cat_Name[1:12])
@@ -658,7 +658,7 @@ server <- function(input, output, session) {
             new_var()$degree.name[1], br(),
             strong("Salary :"), 
             new_var()$X17p[1], br(),
-            strong("Tuition :"), 
+            strong("Tot Annual Cost :"), 
             new_var()$InStOff[1])
       })
       dc <- new_var()$degree.code[1]
@@ -723,7 +723,7 @@ server <- function(input, output, session) {
             new_var()$degree.name[2], br(),
             strong("Salary :"), 
             new_var()$X17p[2], br(),
-            strong("Tuition :"), 
+            strong("Tot Annual Cost :"), 
             new_var()$InStOff[2])
       })
       dc <- new_var()$degree.code[2]
@@ -793,7 +793,7 @@ server <- function(input, output, session) {
             new_var()$degree.name[3], br(),
             strong("Salary :"), 
             new_var()$X17p[3], br(),
-            strong("Tuition :"), 
+            strong("Tot Annual Cost :"), 
             new_var()$InStOff[3])
       })
       dc <- new_var()$degree.code[3]
@@ -865,7 +865,7 @@ server <- function(input, output, session) {
             new_var()$degree.name[1], br(),
             strong("Salary :"), 
             new_var()$X17p[1], br(),
-            strong("Tuition :"), 
+            strong("Tot Annual Cost :"), 
             new_var()$InStOff[1])
       })
       dc <- new_var()$degree.code[1]
@@ -931,7 +931,7 @@ server <- function(input, output, session) {
             new_var()$degree.name[2], br(),
             strong("Salary :"), 
             new_var()$X17p[2], br(),
-            strong("Tuition :"), 
+            strong("Tot Annual Cost :"), 
             new_var()$InStOff[2])
       })
       dc <- new_var()$degree.code[2]
@@ -1001,7 +1001,7 @@ server <- function(input, output, session) {
             new_var()$degree.name[3], br(),
             strong("Salary :"), 
             new_var()$X17p[3], br(),
-            strong("Tuition :"), 
+            strong("Tot Annual Cost :"), 
             new_var()$InStOff[3])
       })
       dc <- new_var()$degree.code[3]
