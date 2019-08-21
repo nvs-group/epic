@@ -35,8 +35,8 @@ salary3 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double
 # Data frame for roi graph
 roi.data <- data.frame(school.n = character(), roi.n = factor())
 # Data frame to convert degree code to number of years for degree
-deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"")
-years <- c(.8,1.5,2,3,4,5,6,7,3,5,10,7,8,1)
+deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"N/A")
+years <- c(.8,1.5,2,3,4,5,6,7,3,5,10,7,8,0)
 num.years <- data.frame(deg.code, years)
 
 ui <- dashboardPagePlus(
@@ -894,7 +894,8 @@ server <- function(input, output, session) {
         s1 <- list(age1 = age, ten_factor1 = tf, occ_factor = new_var()$MedOccF[1], xsalary1 = x, run_total1 = y)
         salary1 <- rbind(salary1, s1)
       }
-      totalcost1 <- new_var()$InStOff[1] * years
+#     Add ".01" so we don't divide by zero 
+      totalcost1 <- new_var()$InStOff[1] * years + .01
       runtot1 <- (salary1$run_total[nrow(salary1)])
       roi1 <- (runtot1 + totalcost1) / totalcost1 * 100
       r1 <- list(school.n = paste("1",new_var()$school.name[1], "\n", new_var()$occ.name[1]), roi.n = roi1)
@@ -959,7 +960,8 @@ server <- function(input, output, session) {
         s2 <- list(age1 = age, ten_factor1 = tf, occ_factor = new_var()$MedOccF[2], xsalary1 = x, run_total1 = y)
         salary2 <- rbind(salary2, s2)
       }
-      totalcost1 <- new_var()$InStOff[2] * years
+#     Add ".01" so we don't divide by zero       
+      totalcost1 <- new_var()$InStOff[2] * years + .01
       runtot1 <- (salary2$run_total[nrow(salary2)])
       roi2 <- (runtot1 + totalcost1) / totalcost1 * 100
       r2 <- list(school.n = paste("2", new_var()$school.name[2], "\n", new_var()$occ.name[2]), roi.n = roi2)
@@ -1029,7 +1031,8 @@ server <- function(input, output, session) {
         s3 <- list(age1 = age, ten_factor1 = tf, occ_factor = new_var()$MedOccF[3], xsalary1 = x, run_total1 = y)
         salary3 <- rbind(salary3, s3)
       }
-      totalcost1 <- new_var()$InStOff[3] * years
+#     Add ".01" so we don't divide by zero 
+      totalcost1 <- new_var()$InStOff[3] * years + .01
       runtot1 <- (salary3$run_total[nrow(salary3)])
       roi3 <- (runtot1 + totalcost1) / totalcost1 * 100
       r3 <- list(school.n = paste("3", new_var()$school.name[3], "\n", new_var()$occ.name[3]), roi.n = roi3)
