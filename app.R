@@ -73,6 +73,13 @@ ui <- dashboardPagePlus(
       #               menuSubItem("One or more incomes?", tabName = "incomes"),
       #               menuSubItem("Kids or no kids?", tabName = "kids"),
       #               menuSubItem("Rich (new), Average (used), Poor (free)?", tabName = "class")),
+      menuItem("Explore Jobs", tabName = "explorejobs", icon = icon("user")),
+      #               menuItem("My Job Stuff", tabName = "occ profile", icon = icon("user"),
+      #               menuSubItem("Explore Jobs", tabName = "explorejobs"),
+      #               menuSubItem("Occupation Select", tabName = "occupation"),
+      #               menuSubItem("Entry level degree", tabName = "entrydegree"),
+      #               menuSubItem("Experience Required", tabName = "experience"),
+      #               menuSubItem("Desired Income", tabName = "salary")),
       menuItem("Explore Schools", tabName = "exploreschools", icon = icon("user")),
 #               menuItem("My School Stuff", tabName = "ed profile", icon = icon("user"),
 #               menuSubItem("Explore Schools", tabName = "exploreschools"),
@@ -81,13 +88,6 @@ ui <- dashboardPagePlus(
 #               menuSubItem("Degree Select", tabName = "degree"),
 #               menuSubItem("Annual Total Cost", tabName = "tuition"),
 #               menuSubItem("State", tabName = "state")),
-      menuItem("Explore Jobs", tabName = "explorejobs", icon = icon("user")),
-#              menuItem("My Job Stuff", tabName = "occ profile", icon = icon("user"),
-#               menuSubItem("Explore Jobs", tabName = "explorejobs"),
-#               menuSubItem("Occupation Select", tabName = "occupation"),
-#               menuSubItem("Entry level degree", tabName = "entrydegree"),
-#               menuSubItem("Experience Required", tabName = "experience"),
-#               menuSubItem("Desired Income", tabName = "salary")),
       #      menuItem("My Peers", tabName = "peers", icon = icon("user"),
       #               menuSubItem("Similar lifestyle", tabName = "peer life"),
       #               menuSubItem("Similar schooling", tabName = "peer school"),
@@ -95,6 +95,7 @@ ui <- dashboardPagePlus(
       #               menuSubItem("Best match", tabName = "peer match")),
       menuItem("Select Scenerios", tabName = "buildbasic", icon = icon("tasks")),
       menuItem("Compare Scenarios", tabName = "compare", icon = icon("tasks")),
+      menuItem("Look for Jobs", tabName = "jobsearch", icon = icon("tasks")),
       menuItem("Tools", tabName = "tools", icon = icon("toolbox")),
       menuItem("About", tabName = "about", icon = icon("info"))
     )
@@ -105,10 +106,11 @@ ui <- dashboardPagePlus(
     dashboardBody(
     tabItems(
       tabItem(tabName = "home",
-              h2("Welcome to EPIC, the Education-Profession Investment Calculator")
-      ),
-      tabItem(tabName = "profile",
-              h2("Thanks")
+              h2("Welcome to EPIC, the Education-Profession Investment Calculator"),
+              h2("Hello and Welcome to your EPIC experience"),
+              h2("Test drive the world's first fully 
+                 integrated"),
+              h2("Education-Profession Investment Calculator")
       ),
       tabItem(tabName = "about",
               h2("Hello and Welcome to your EPIC experience"),
@@ -149,6 +151,9 @@ ui <- dashboardPagePlus(
       ),
       tabItem(tabName = "instructions",
               h2("Click on your school and job preferences. If you really don't know, leave it blank")
+      ),
+      tabItem(tabName = "jobsearch",
+              h2("Go to www.onetonline.org to look for jobs")
       ),
       tabItem(tabName = "school",
               h3("I would consider these schools:"),
