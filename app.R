@@ -165,36 +165,36 @@ ui <- dashboardPagePlus(
 #                            multiple = TRUE)
 #                )
 #              ),
-      tabItem(tabName = "degree",
-              h3("I want to get this degree and then get a job"),
-              box(
-                width = 5,
-                selectInput(inputId = "pre.degree.name",
-                            label = NULL,
-                            choices = levels(master1$degree.name),
-                            multiple = TRUE)
-                )
-              ),
-      tabItem(tabName = "entrydegree",
-              h3("My occupation requires at least this degree level"),
-              box(
-                width = 5,
-                selectInput(inputId = "pre.entry.degree",
-                            label = NULL,
-                            choices = levels(master1$entry.degree),
-                            multiple = TRUE)
-                )
-              ),
-      tabItem(tabName = "experience",
-              h3("I need this much work experience to get this job"),
-              box(
-                width = 5,
-                selectInput(inputId = "pre.experience",
-                            label = NULL,
-                            choices = levels(master1$Experience),
-                            multiple = TRUE)
-                )
-              ),
+#      tabItem(tabName = "degree",
+#              h3("I want to get this degree and then get a job"),
+#              box(
+#                width = 5,
+#                selectInput(inputId = "pre.degree.name",
+#                            label = NULL,
+#                            choices = levels(master1$degree.name),
+#                            multiple = TRUE)
+#                )
+#              ),
+#      tabItem(tabName = "entrydegree",
+#              h3("My occupation requires at least this degree level"),
+#              box(
+#                width = 5,
+#                selectInput(inputId = "pre.entry.degree",
+#                            label = NULL,
+#                            choices = levels(master1$entry.degree),
+#                            multiple = TRUE)
+#                )
+#              ),
+#      tabItem(tabName = "experience",
+#              h3("I need this much work experience to get this job"),
+#              box(
+#                width = 5,
+#                selectInput(inputId = "pre.experience",
+#                            label = NULL,
+#                            choices = levels(master1$Experience),
+#                            multiple = TRUE)
+#                )
+#              ),
 #      tabItem(tabName = "state",
 #              h3("I would consider schools in these states:"),
 #              box(
@@ -205,67 +205,67 @@ ui <- dashboardPagePlus(
 #                            multiple = TRUE)
 #                )
 #              ),
-      tabItem(tabName = "occupation",
-              h3("I would consider jobs in these areas"),
-              fluidRow(
-                box(
-                  width = 4,
-                  checkboxGroupInput(inputId = "pre.occupation1",
-                                     label = NULL,
-                                     choices = soc_group1)),
-                box(
-                  width = 4,
-                  checkboxGroupInput(inputId = "pre.occupation2",
-                                     label = NULL,
-                                     choices = soc_group2))
-                )
-              ),
-      tabItem(tabName = "curriculum",
-              h3("I would consider studying these areas"),
-              fluidRow(
-                box(width = 3,
-                    checkboxGroupInput(inputId = "survey.Cip_Category1",
-                                       label = NULL,
-                                       choices = cip_group1)
-                ),
-                box(width = 3,
-                    checkboxGroupInput(inputId = "survey.Cip_Category2",
-                                       label = NULL,
-                                       choices = cip_group2)
-                ),
-                box(width = 3,
-                    checkboxGroupInput(inputId = "survey.Cip_Category3",
-                                       label = NULL,
-                                       choices = cip_group3)
-                ),
-                box(width = 3,
-                    checkboxGroupInput(inputId = "survey.Cip_Category4",
-                                       label = NULL,
-                                       choices = cip_group4)
-                    )
-                )
-              ),
-      tabItem(tabName = "salary",
-              h3("I would like to make at least this amount when I get out of school"),
-              box(
-                sliderInput(inputId = "pre.income",
-                            label = NULL,
-                            value = min(sort(unique(master1$X17p))),
-                            min = min(sort(unique(master1$X17p))),
-                            max = max(sort(unique(master1$X17p))))
-                )
-              ),
-      tabItem(tabName = "tuition",
-              h3("I don't want to spend more than this amount per year for school"),
-              box(
-                sliderInput(inputId = "pre.tuition",
-                            label = NULL,
-                            value = max(sort(unique(master1$InStOff))),
-                            min = min(sort(unique(master1$InStOff))),
-                            step = 1000,
-                            max = max(sort(unique(master1$InStOff))))
-                )
-              ),
+#      tabItem(tabName = "occupation",
+#              h3("I would consider jobs in these areas"),
+#              fluidRow(
+#                box(
+#                  width = 4,
+#                  checkboxGroupInput(inputId = "pre.occupation1",
+#                                     label = NULL,
+#                                     choices = soc_group1)),
+#                box(
+#                  width = 4,
+#                  checkboxGroupInput(inputId = "pre.occupation2",
+#                                     label = NULL,
+#                                     choices = soc_group2))
+#                )
+#              ),
+#      tabItem(tabName = "curriculum",
+#              h3("I would consider studying these areas"),
+#              fluidRow(
+#                box(width = 3,
+#                    checkboxGroupInput(inputId = "survey.Cip_Category1",
+#                                       label = NULL,
+#                                       choices = cip_group1)
+#                ),
+#                box(width = 3,
+#                    checkboxGroupInput(inputId = "survey.Cip_Category2",
+#                                       label = NULL,
+#                                       choices = cip_group2)
+#                ),
+#                box(width = 3,
+#                    checkboxGroupInput(inputId = "survey.Cip_Category3",
+#                                       label = NULL,
+#                                       choices = cip_group3)
+#                ),
+#                box(width = 3,
+#                    checkboxGroupInput(inputId = "survey.Cip_Category4",
+#                                       label = NULL,
+#                                       choices = cip_group4)
+#                    )
+#                )
+#              ),
+#      tabItem(tabName = "salary",
+#              h3("I would like to make at least this amount when I get out of school"),
+#              box(
+#                sliderInput(inputId = "pre.income",
+#                            label = NULL,
+#                            value = min(sort(unique(master1$X17p))),
+#                            min = min(sort(unique(master1$X17p))),
+#                            max = max(sort(unique(master1$X17p))))
+#                )
+#              ),
+#      tabItem(tabName = "tuition",
+#              h3("I don't want to spend more than this amount per year for school"),
+#              box(
+#                sliderInput(inputId = "pre.tuition",
+#                            label = NULL,
+#                            value = max(sort(unique(master1$InStOff))),
+#                            min = min(sort(unique(master1$InStOff))),
+#                            step = 1000,
+#                            max = max(sort(unique(master1$InStOff))))
+#                )
+#              ),
       tabItem(tabName = "exploreschools",
               fluidRow(
                 box(width = 2,
@@ -346,66 +346,66 @@ ui <- dashboardPagePlus(
               ),
       tabItem(tabName = "buildbasic",
               fluidRow(
-                box(width = 2,
+#                box(width = 2,
 #                    h3("School"),
-                    selectInput(inputId = "nvs.school.name",
-                                label= "School Name:",
-                                choices =  levels(master1$school.name),
-                                multiple = TRUE),
-
-                    sliderInput(inputId = "nvs.tuition",
-                                label = "Desired Tuition Level",
-                                value = max(sort(unique(master1$InStOff))),
-                                min = min(sort(unique(master1$InStOff))),
-                                step = 1000,
-                                max = max(sort(unique(master1$InStOff))))),
-                box(width = 2,
-
-                    selectInput(inputId = "nvs.cip.cat",
-                                label = "Curriculum Category:",
-                                choices = cip1$CIP_Category,
-                                multiple = TRUE),
-
-                    selectInput(inputId = "nvs.cip.name",
-                                label = "Curriculum Name:",
-                                choices = levels(master1$cip.name),
-                                multiple = TRUE)),
-                box(width = 2,
-
-                    selectInput(inputId = "nvs.state",
-                                label = "State:",
-                                choices = levels(master1$State),
-                                multiple = TRUE),
-                    selectInput(inputId = "nvs.degree.name",
-                                label = "Degree Name:",
-                                choices =  levels(master1$degree.name),
-                                multiple = TRUE)),
+#                    selectInput(inputId = "nvs.school.name",
+#                                label= "School Name:",
+#                                choices =  levels(master1$school.name),
+#                                multiple = TRUE),
+#
+#                    sliderInput(inputId = "nvs.tuition",
+#                                label = "Desired Tuition Level",
+#                                value = max(sort(unique(master1$InStOff))),
+#                                min = min(sort(unique(master1$InStOff))),
+#                                step = 1000,
+#                                max = max(sort(unique(master1$InStOff))))),
+#                box(width = 2,
+#
+#                    selectInput(inputId = "nvs.cip.cat",
+#                                label = "Curriculum Category:",
+#                                choices = cip1$CIP_Category,
+#                                multiple = TRUE),
+#
+#                    selectInput(inputId = "nvs.cip.name",
+#                                label = "Curriculum Name:",
+#                                choices = levels(master1$cip.name),
+#                                multiple = TRUE)),
+#                box(width = 2,
+#
+#                    selectInput(inputId = "nvs.state",
+#                                label = "State:",
+#                                choices = levels(master1$State),
+#                                multiple = TRUE),
+#                    selectInput(inputId = "nvs.degree.name",
+#                                label = "Degree Name:",
+#                                choices =  levels(master1$degree.name),
+#                                multiple = TRUE)),
 #                h3("Job"),
-                box(width = 2,
-                    selectInput(inputId = "nvs.occ.cat",
-                                label = "Occupation Category:",
-                                choices = soc1$SOC_Cat_Name,
-                                multiple = TRUE),
-                    selectInput(inputId = "nvs.occ.name",
-                                label = "Occupation Name:",
-                                choices = levels(master1$occ.name),
-                                multiple = TRUE)),
-                box(width = 2,
-                    selectInput(inputId = "nvs.experience",
-                                label = "Experience:",
-                                choices =  levels(master1$Experience),
-                                multiple = TRUE),
-                    selectInput(inputId = "nvs.entry.degree",
-                                label = "Rqd Entry Degree:",
-                                choices =  levels(master1$entry.degree),
-                                multiple = TRUE)),
-                box(width = 2,
-                    sliderInput(inputId = "nvs.income",
-                                label = "Desired Income Level:",
-                                value = min(sort(unique(master1$X17p))),
-                                min = min(sort(unique(master1$X17p))),
-                                max = max(sort(unique(master1$X17p))))
-                    ),
+#                box(width = 2,
+#                    selectInput(inputId = "nvs.occ.cat",
+#                                label = "Occupation Category:",
+#                                choices = soc1$SOC_Cat_Name,
+#                                multiple = TRUE),
+#                    selectInput(inputId = "nvs.occ.name",
+#                                label = "Occupation Name:",
+#                                choices = levels(master1$occ.name),
+#                                multiple = TRUE)),
+#                box(width = 2,
+#                    selectInput(inputId = "nvs.experience",
+#                                label = "Experience:",
+#                                choices =  levels(master1$Experience),
+#                                multiple = TRUE),
+#                    selectInput(inputId = "nvs.entry.degree",
+#                                label = "Rqd Entry Degree:",
+#                                choices =  levels(master1$entry.degree),
+#                                multiple = TRUE)),
+#                box(width = 2,
+#                    sliderInput(inputId = "nvs.income",
+#                                label = "Desired Income Level:",
+#                                value = min(sort(unique(master1$X17p))),
+#                                min = min(sort(unique(master1$X17p))),
+#                                max = max(sort(unique(master1$X17p))))
+#                    ),
                 box(
                   width = 12,
                   div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "nvs.choice.table"))
