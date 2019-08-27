@@ -155,16 +155,16 @@ ui <- dashboardPagePlus(
       tabItem(tabName = "jobsearch",
               h2("Go to www.onetonline.org to look for jobs")
       ),
-      tabItem(tabName = "school",
-              h3("I would consider these schools:"),
-              box(
-                width = 5,
-                selectInput(inputId = "pre.school.name",
-                            label = NULL,
-                            choices = levels(master1$school.name),
-                            multiple = TRUE)
-                )
-              ),
+#      tabItem(tabName = "school",
+#              h3("I would consider these schools:"),
+#              box(
+#                width = 5,
+#                selectInput(inputId = "pre.school.name",
+#                            label = NULL,
+#                            choices = levels(master1$school.name),
+#                            multiple = TRUE)
+#                )
+#              ),
       tabItem(tabName = "degree",
               h3("I want to get this degree and then get a job"),
               box(
@@ -195,16 +195,16 @@ ui <- dashboardPagePlus(
                             multiple = TRUE)
                 )
               ),
-      tabItem(tabName = "state",
-              h3("I would consider schools in these states:"),
-              box(
-                width = 5,
-                selectInput(inputId = "pre.state",
-                            label = NULL,
-                            choices = levels(master1$State),
-                            multiple = TRUE)
-                )
-              ),
+#      tabItem(tabName = "state",
+#              h3("I would consider schools in these states:"),
+#              box(
+#                width = 5,
+#                selectInput(inputId = "pre.state",
+#                            label = NULL,
+#                            choices = levels(master1$State),
+#                            multiple = TRUE)
+#                )
+#              ),
       tabItem(tabName = "occupation",
               h3("I would consider jobs in these areas"),
               fluidRow(
@@ -570,7 +570,7 @@ server <- function(input, output, session) {
   #Explore schools table
   observe ( {  
     output$nvs.schools.table <- renderDataTable({
-      DT::datatable(data = table_var()  %>% select(input$schools.column.names), 
+      DT::datatable(data = table_var() %>% distinct(table_var1()$school.name, .keep_all = TRUE)  %>% select(input$schools.column.names), 
                     options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "multiple"))
     })
   })
@@ -578,7 +578,7 @@ server <- function(input, output, session) {
   #Explore jobs table
   observe ( {  
     output$nvs.jobs.table <- renderDataTable({
-      DT::datatable(data = table_var()  %>% select(input$jobs.column.names), 
+      DT::datatable(data = table_var() %>% distinct(table_var1()$occ.name, .keep_all = TRUE)  %>% select(input$jobs.column.names), 
                     options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "multiple"))
     })
   })
