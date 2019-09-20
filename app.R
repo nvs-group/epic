@@ -116,7 +116,8 @@ ui <- dashboardPagePlus(
               h2("Hello and Welcome to your EPIC experience"),
               h2("Test drive the world's first fully 
                  integrated"),
-              h2("Education-Profession Investment Calculator")
+              h2("Education-Profession Investment Calculator"),
+              h2("Text or call Lynn Chapman at 703-348-4086 for help or questions")
       ),
       tabItem(tabName = "tools",
               h2("This is where tools go."),
@@ -150,7 +151,8 @@ ui <- dashboardPagePlus(
                                                    "IGrant.Avg", "IGrant..age"), choices = names(master1)))
       ),
       tabItem(tabName = "instructions",
-              h2("Click on your school and job preferences. If you really don't know, leave it blank")
+              h2("Click on your school and job preferences. If you really don't know, leave it blank"),
+              h2("Text or call Lynn Chapman at 703-348-4086 for help or questions")
       ),
       tabItem(tabName = "jobsearch",
               h2("Go to www.onetonline.org to look for jobs")
@@ -571,7 +573,7 @@ server <- function(input, output, session) {
   observe ( {  
     output$nvs.schools.table <- renderDataTable({
       DT::datatable(data = table_var() %>% distinct(table_var1()$school.name, .keep_all = TRUE)  %>% select(input$schools.column.names), 
-                    options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "multiple"))
+                    options = list(pageLength = input$RecordsNum, filter = FALSE, order = list(list(3, 'sc'))) ,selection = list(mode = "multiple"))
     })
   })
   
@@ -579,7 +581,7 @@ server <- function(input, output, session) {
   observe ( {  
     output$nvs.jobs.table <- renderDataTable({
       DT::datatable(data = table_var() %>% distinct(table_var1()$occ.name, .keep_all = TRUE)  %>% select(input$jobs.column.names), 
-                    options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "multiple"))
+                    options = list(pageLength = input$RecordsNum, filter = FALSE, order = list(list(4, 'desc'))) ,selection = list(mode = "multiple"))
     })
   })
   
