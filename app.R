@@ -43,8 +43,8 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #scenario <- colnames(master1)
 #Credentials
 credentials = data.frame(
-  username_id = c("Epic","John","Lynn","Steven"),
-  passod   = sapply(c("pass1","pass2","pass3","pass4"),password_store),
+  username_id = c("Epic","John","Lynn","Steven","Generic"),
+  passod   = sapply(c("pass1","pass2","pass3","pass4","pass5"),password_store),
   permission  = c("advanced"), 
   stringsAsFactors = F
 )
