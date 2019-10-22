@@ -556,8 +556,12 @@ server <- function(input, output, session) {
   })
   observeEvent(input$load_scenario, {
     filename <- paste0(input$userName, ".rds")
+    if(file.exists(filename)) {
     scenario$Data <- readRDS(filename)
-    shinyalert(title = "Loaded",, type = "success")
+    shinyalert(title = "Loaded", type = "success")
+    } else {
+      shinyalert(title = "File not found", type = "error")
+    }
   })
 }
 
