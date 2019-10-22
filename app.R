@@ -16,7 +16,15 @@ library(sodium)
 library(data.table)
 library(lubridate)
 library(shinyalert)
+library(rdrop2)
+library(assertive)
 
+#token <- drop_auth()
+#saveRDS(token, "droptoken.rds")
+#drop_auth(rdstoken = "droptoken.rds")
+token <- readRDS("droptoken.rds")
+# Then pass the token to each drop_ function
+#drop_acc(dtoken = token)
 
 selectedrowindex = 0
 #Read in main data table from your local directory
@@ -35,8 +43,8 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #scenario <- colnames(master1)
 #Credentials
 credentials = data.frame(
-  username_id = c("Epic","John","Lynn"),
-  passod   = sapply(c("pass1","pass2","pass3"),password_store),
+  username_id = c("Epic","John","Lynn","Steven"),
+  passod   = sapply(c("pass1","pass2","pass3","pass4"),password_store),
   permission  = c("advanced"), 
   stringsAsFactors = F
 )
@@ -401,8 +409,6 @@ server <- function(input, output, session) {
   observeEvent(input$add_scenarios, {
     scenario_to_add <- table_var()[input$epic.choice.table_rows_selected,]
     scenario$Data <- rbind(scenario$Data, scenario_to_add)
-    print(str(scenario$Data))
-    print(scenario$Data$occ.name)
   })
   #Delete Button  
   observeEvent(input$delete_scenario, {
@@ -552,16 +558,21 @@ server <- function(input, output, session) {
   observeEvent(input$save_scenario,{
     filename <- paste0(input$userName, ".rds")
     saveRDS(scenario$Data, filename)
+    drop_upload(filename, path = "responses")
+    print(filename)
     shinyalert(title = "Saved!", type = "success")
   })
   observeEvent(input$load_scenario, {
-    filename <- paste0(input$userName, ".rds")
-    if(file.exists(filename)) {
-    scenario$Data <- readRDS(filename)
-    shinyalert(title = "Loaded", type = "success")
+    filename2 <- paste0("responses/",input$userName, ".rds")
+    if(drop_exists(filename2) == FALSE) {
+      shinyalert(title = "File Not Found", type = "error")
     } else {
-      shinyalert(title = "File not found", type = "error")
-    }
+#      filename2 <- paste0("responses", filename)
+      drop_download(filename2, overwrite = TRUE)
+      filename <- paste0(input$userName, ".rds")
+      scenario$Data <- readRDS(filename)
+      shinyalert(title = "Loaded", type = "success")
+    } 
   })
 }
 
