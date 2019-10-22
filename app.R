@@ -19,16 +19,16 @@ library(shinyalert)
 library(rdrop2)
 library(assertive)
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
 #token <- drop_auth()
 #saveRDS(token, "droptoken.rds")
 #drop_auth(rdstoken = "droptoken.rds")
 token <- readRDS("droptoken.rds")
 # Then pass the token to each drop_ function
 #drop_acc(dtoken = token)
-=======
+#=======
 
->>>>>>> d3ed6107a84f767ab8b7196abb0e34e3021e7b0e
+#>>>>>>> d3ed6107a84f767ab8b7196abb0e34e3021e7b0e
 
 selectedrowindex = 0
 #Read in main data table from your local directory
