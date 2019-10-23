@@ -22,8 +22,8 @@ library(assertive)
 #<<<<<<< HEAD
 #token <- drop_auth()
 #saveRDS(token, "droptoken.rds")
-#drop_auth(rdstoken = "droptoken.rds")
 token <- readRDS("droptoken.rds")
+drop_auth(rdstoken = "droptoken.rds")
 # Then pass the token to each drop_ function
 #drop_acc(dtoken = token)
 #=======
@@ -46,13 +46,18 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 # Main login screen
 #scenario <- colnames(master1)
 #Credentials
-credentials = data.frame(
-  username_id = c("Epic","John","Lynn","Steven","Generic"),
-  passod   = sapply(c("pass1","pass2","pass3","pass4","pass5"),password_store),
-  permission  = c("advanced"), 
-  stringsAsFactors = F
-)
+#usernames <- c("Epic","John","Lynn","Steven","Generic")
 
+#credentials = data.frame(
+#  username_id = "Epic",
+#  passod   = sapply("pass1",password_store),
+#  permission  = c("advanced"), 
+#  stringsAsFactors = F
+#)
+#saveRDS(credentials, "cred.rds")
+#drop_upload("cred.rds", path = "responses")
+drop_download("responses/cred.rds", overwrite = TRUE)
+credentials <- readRDS("cred.rds")
 header <- dashboardHeader( title = "E.P.I.C. Planning", titleWidth = 230, uiOutput("logoutbtn"))
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 body <- dashboardBody(
@@ -68,12 +73,7 @@ body <- dashboardBody(
             h2("Hello and Welcome to your EPIC experience"),
             h2("Test drive the world's first fully integrated"),
             h2("Education-Profession Investment Calculator"),
-            h2("Text or call Lynn Chapman at 703-348-4086 for help or questions"),
-            fluidPage(
-              fluidRow(
-                box(width = 3,
-                    actionButton(inputId = "load_existing", label = "Load Existing", width = '100%'))
-              ))
+            h2("Text or call Lynn Chapman at 703-348-4086 for help or questions")
     ),
     tabItem(tabName = "tools",
             h2("This is where tools go."),
@@ -252,8 +252,16 @@ body <- dashboardBody(
                                  font-size: 18px; font-weight: 600;"),
                     br(),
                     br(),
-                    tags$code("Username: Epic  Password: pass1")
-                  ))
+                    br()
+                  ),
+                  div(
+                    style = "text-align: center;",
+                    actionButton("add_user", "Create Account", style = "color: white; background-color:#808080;
+                                 padding: 10px 15px; width: 200px; cursor: pointer;
+                                 font-size: 16px; font-weight: 600;"),
+                    br()
+                  )
+                  )
             ))
   )
   
@@ -282,32 +290,6 @@ server <- function(input, output, session) {
       }
     } 
   })
-  #  observe({ 
-  #    if (USER$login == FALSE) {
-  #      if (!is.null(input$login)) {
-  #        if (input$login > 0) {
-  #          Username <- isolate(input$userName)
-  #          Password <- isolate(input$passwd)
-  #          if(length(which(credentials$username_id==Username))==1) { 
-  #            pasmatch  <- credentials["passod"][which(credentials$username_id==Username),]
-  #            pasverify <- password_verify(pasmatch, Password)
-  #            if(pasverify) {
-  #              USER$login <- TRUE
-  #            } else {
-  #              print("fail")
-  #              shinyjs::toggle(id = "nomatch", anim = TRUE, time = 1, animType = "fade")
-  #              shinyjs::delay(3000, shinyjs::toggle(id = "nomatch", anim = TRUE, time = 1, animType = "fade"))
-  #            }
-  #          } else {
-  #            print("fail")
-  #            shinyjs::toggle(id = "nomatch", anim = TRUE, time = 1, animType = "fade")
-  #            shinyjs::delay(3000, shinyjs::toggle(id = "nomatch", anim = TRUE, time = 1, animType = "fade"))
-  ##          }
-  #        } 
-  #      }
-  #    }    
-  #  })
-  
   output$logoutbtn <- renderUI({
     req(USER$login)
     tags$li(a(icon("fa fa-sign-out"), "Logout", 
@@ -563,7 +545,7 @@ server <- function(input, output, session) {
     filename <- paste0(input$userName, ".rds")
     saveRDS(scenario$Data, filename)
     drop_upload(filename, path = "responses")
-    print(filename)
+
     shinyalert(title = "Saved!", type = "success")
   })
   observeEvent(input$load_scenario, {
@@ -577,6 +559,28 @@ server <- function(input, output, session) {
       scenario$Data <- readRDS(filename)
       shinyalert(title = "Loaded", type = "success")
     } 
+  })
+  observeEvent(input$add_user, {
+    ### This is the pop up board for input a new row
+    showModal(modalDialog(title = "Add a new account",
+                          textInput(paste0("Names_add", input$Add_row_head), "Name"),
+                          textInput(paste0("Password_add", input$Add_row_head), "Password"), 
+                          actionButton("go", "Add item"),
+                          easyClose = TRUE, footer = NULL ))
+    
+  })
+  ### Add a new row to DT  
+  observeEvent(input$go, {
+    new_row=data.frame(
+      username_id = input[[paste0("Names_add", input$Add_row_head)]],
+      passod = sapply(input[[paste0("Password_add", input$Add_row_head)]],password_store),
+      permission = "advanced",
+      stringsAsFactors = FALSE
+    )
+    credentials <<- rbind(credentials, new_row)
+    saveRDS(credentials, "cred.rds")
+    drop_upload("cred.rds", path = "responses")
+    removeModal()
   })
 }
 
