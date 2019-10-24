@@ -82,12 +82,12 @@ body <- dashboardBody(
                                  selected = 10)
                 ),
                 box(width = 4,
-                    h4("Explore career occupations:", a("https://www.onetonline.org/", href = "https://www.onetonline.org/")),
-                    h4("Explore schools:", a("https://collegescorecard.ed.gov/", href = "https://collegescorecard.ed.gov/")),
-                    h4("Skills assessment:", a("https://www.careeronestop.org/", href = "https://www.careeronestop.org/")),
-                    h4("Advanced Skills assessment:", a("https://www.wowi.com/", href = "https://www.wowi.com/")),
-                    h4("What do you want to do for a living?", a("https://www.mynextmove.org/", href = "https://www.mynextmove.org/")),
-                    h4("School comparison and Research Tool", a("https://nces.ed.gov/collegenavigator/", href = "https://nces.ed.gov/collegenavigator/"))
+                    h4("Explore career occupations:", a("https://www.onetonline.org/", href = "https://www.onetonline.org/", target = "_blank")),
+                    h4("Explore schools:", a("https://collegescorecard.ed.gov/", href = "https://collegescorecard.ed.gov/", target = "_blank")),
+                    h4("Skills assessment:", a("https://www.careeronestop.org/", href = "https://www.careeronestop.org/", target = "_blank")),
+                    h4("Advanced Skills assessment:", a("https://www.wowi.com/", href = "https://www.wowi.com/", target = "_blank")),
+                    h4("What do you want to do for a living?", a("https://www.mynextmove.org/", href = "https://www.mynextmove.org/", target = "_blank")),
+                    h4("School comparison and Research Tool", a("https://nces.ed.gov/collegenavigator/", href = "https://nces.ed.gov/collegenavigator/", target = "_blank"))
                 )),
               box(width = 4,
                   checkboxGroupInput(inputId = "basic.column.names", label = "Pick the scenario columns you would like",
@@ -107,7 +107,7 @@ body <- dashboardBody(
             h2("Text or call Lynn Chapman at 703-348-4086 for help or questions")
     ),
     tabItem(tabName = "jobsearch",
-            h2("Go to ", a("www.onetonline.org", href ="https://www.onetonline.org/"), " to look for jobs")
+            h2("Go to ", a("www.onetonline.org", href ="https://www.onetonline.org/", target = "_blank"), " to look for jobs")
     ),
     
     tabItem(tabName = "exploreschools",
@@ -486,7 +486,6 @@ server <- function(input, output, session) {
             strong("Tot Annual Cost :"), 
             scenario$Data$InStOff[index])
       })
-      
     }
   })
   observeEvent(input$add_two_compare, {
@@ -507,7 +506,6 @@ server <- function(input, output, session) {
             strong("Tot Annual Cost :"), 
             scenario$Data$InStOff[index])
       })
-      
     }
   })
   observeEvent(input$add_three_compare, {
@@ -528,7 +526,6 @@ server <- function(input, output, session) {
             strong("Tot Annual Cost :"), 
             scenario$Data$InStOff[index])
       })
-      
     }
   })
   observeEvent(input$clear_all, {
@@ -541,7 +538,6 @@ server <- function(input, output, session) {
     filename <- paste0(input$userName, ".rds")
     saveRDS(scenario$Data, filename)
     drop_upload(filename, path = "responses")
-
     shinyalert(title = "Saved!", type = "success")
   })
   observeEvent(input$load_scenario, {
@@ -563,7 +559,6 @@ server <- function(input, output, session) {
                           textInput(paste0("Password_add", input$Add_row_head), "Password"), 
                           actionButton("go", "Add item"),
                           easyClose = TRUE, footer = NULL ))
-    
   })
   ### Add a new row to DT  
   observeEvent(input$go, {
