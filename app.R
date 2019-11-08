@@ -31,7 +31,7 @@ selectedrowindex = 0
 #master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
 master1 <- read.csv("Master1.csv", stringsAsFactors = FALSE)
-
+scenario_temp <- master1[FALSE,]
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
@@ -54,6 +54,24 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #drop_upload("cred.rds", path = "responses")
 drop_download("responses/cred.rds", overwrite = TRUE)
 credentials <- readRDS("cred.rds")
+
+place_card <- function(index){
+  pcresult <- box(width = 4,
+                  strong("Occupation :"), 
+                  scenario_temp$occ.name[index], br(),
+                  strong("School :"), 
+                  scenario_temp$school.name[index], br(),
+                  strong("Curriculum :"), 
+                  scenario_temp$cip.name[index], br(),
+                  strong("Degree :"), 
+                  scenario_temp$degree.name[index], br(),
+                  strong("Salary :"), 
+                  scenario_temp$X17p[index], br(),
+                  strong("Tot Annual Cost :"), 
+                  scenario_temp$InStOff[index])
+  return(pcresult)
+}
+
 header <- dashboardHeader( title = "E.P.I.C. Planning", titleWidth = 230, uiOutput("logoutbtn"))
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 body <- dashboardBody(
@@ -125,19 +143,16 @@ body <- dashboardBody(
                               step = 1000,
                               max = max(sort(unique(master1$InStOff))))),
               box(width = 2,
-                  
                   selectInput(inputId = "epic.cip.cat",
                               label = "Curriculum Category:",
                               choices = cip1$CIP_Category,
                               multiple = TRUE)),
               box(width = 2,
-                  
                   selectInput(inputId = "epic.cip.name",
                               label = "Curriculum Name:",
                               choices = unique(master1$cip.name),
                               multiple = TRUE)),
               box(width = 2,
-                  
                   selectInput(inputId = "epic.state",
                               label = "State:",
                               choices = unique(master1$State),
@@ -217,7 +232,13 @@ body <- dashboardBody(
             ),
             fluidRow(
               box(width = 4,
-                  actionButton(inputId = "clear_all", label = "Clear all Scenarios", width = '100%'))
+                  actionButton(inputId = "clear_all", label = "Clear all Scenarios", width = '100%')),
+              
+              box(width = 2,
+                  numericInput(inputId = "num_years", label = "Number of years to chart", value = 4, min = 1, max = 70 )),
+              box(width = 2,
+                  strong("Press to create Graph"),br(),
+                  actionButton(inputId = "create_data", label = "Go", width = '100%'))
             ),
             fluidRow(
               box(width = 4,
@@ -260,7 +281,6 @@ body <- dashboardBody(
                   )
             ))
   )
-  
 )
 ui <- dashboardPagePlus(header, sidebar, body, skin = "blue")
 
@@ -294,7 +314,6 @@ server <- function(input, output, session) {
             style = "background-color: #eee !important; border: 0;
                     font-weight: bold; margin:5px; padding: 10px;")
   })
-  
   output$sidebarpanel <- renderUI({
     if (USER$login == TRUE ){ 
       if (credentials[,"permission"][which(credentials$username_id==input$userName)]=="advanced") {
@@ -384,21 +403,20 @@ server <- function(input, output, session) {
         soc1$SOC_Code[soc1$SOC_Cat_Name %in% input$epic.occ.cat]
       }
   })
-  
-  scenario <- reactiveValues()
-  
+ 
   #Add button 
   observeEvent(input$add_scenarios, {
     scenario_to_add <- table_var()[input$epic.choice.table_rows_selected,]
-    scenario$Data <- rbind(scenario$Data, scenario_to_add)
+    scenario_temp <<- rbind(scenario_temp, scenario_to_add)
+    row.names(scenario_temp) <<- 1:nrow(scenario_temp)
   })
   #Delete Button  
   observeEvent(input$delete_scenario, {
     if(length(input$epic.scenarios.table_rows_selected)>= 1){
-      scenario$Data = scenario$Data[-input$epic.scenarios.table_rows_selected,]
+      scenario_temp <<- scenario_temp[-input$epic.scenarios.table_rows_selected,]
+      row.names(scenario_temp) <<- 1:nrow(scenario_temp)
     }
   })
-  #  scenario_table <- reactive ({ scenario })
   #Filter for First Table
   table_var <- reactive({
     filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
@@ -448,7 +466,7 @@ server <- function(input, output, session) {
     })
   })
   
-  #First Table
+  #Choice Table
   observe ( {  
     output$epic.choice.table <- renderDataTable({
       DT::datatable(data = table_var()  %>% select(input$basic.column.names), 
@@ -457,34 +475,20 @@ server <- function(input, output, session) {
   })
   
   observe ( {
-    if(!is.null(scenario$Data)){
+    req(input$add_scenarios | input$delete_scenario | input$load_scenario)
       output$epic.scenarios.table <- renderDataTable({
-        DT::datatable(data = scenario$Data %>% select(input$basic.column.names), rownames = FALSE,
+        DT::datatable(data = scenario_temp %>% select(input$basic.column.names), rownames = TRUE,
                       options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "single"))
       })
-    }
   })
   
   #Table prep with filters and Column choices for second table
-  #  new_var <- scenario$Data[input$epic.choice.table_rows_selected,]
-  
+
   observeEvent(input$add_one_compare, {
     index <- input$epic.scenarios.table_rows_selected
     if(!is.null(index)) {
       output$row.choice.table1 <- renderUI({
-        box(width = 4,
-            strong("Occupation :"), 
-            scenario$Data$occ.name[index], br(),
-            strong("School :"), 
-            scenario$Data$school.name[index], br(),
-            strong("Curriculum :"), 
-            scenario$Data$cip.name[index], br(),
-            strong("Degree :"), 
-            scenario$Data$degree.name[index], br(),
-            strong("Salary :"), 
-            scenario$Data$X17p[index], br(),
-            strong("Tot Annual Cost :"), 
-            scenario$Data$InStOff[index])
+        place_card(index)
       })
     }
   })
@@ -492,19 +496,7 @@ server <- function(input, output, session) {
     index <- input$epic.scenarios.table_rows_selected
     if(!is.null(index)) {
       output$row.choice.table2 <- renderUI({
-        box(width = 4,
-            strong("Occupation :"), 
-            scenario$Data$occ.name[index], br(),
-            strong("School :"), 
-            scenario$Data$school.name[index], br(),
-            strong("Curriculum :"), 
-            scenario$Data$cip.name[index], br(),
-            strong("Degree :"), 
-            scenario$Data$degree.name[index], br(),
-            strong("Salary :"), 
-            scenario$Data$X17p[index], br(),
-            strong("Tot Annual Cost :"), 
-            scenario$Data$InStOff[index])
+        place_card(index)
       })
     }
   })
@@ -512,43 +504,33 @@ server <- function(input, output, session) {
     index <- input$epic.scenarios.table_rows_selected
     if(!is.null(index)) {
       output$row.choice.table3 <- renderUI({
-        box(width = 4,
-            strong("Occupation :"), 
-            scenario$Data$occ.name[index], br(),
-            strong("School :"), 
-            scenario$Data$school.name[index], br(),
-            strong("Curriculum :"), 
-            scenario$Data$cip.name[index], br(),
-            strong("Degree :"), 
-            scenario$Data$degree.name[index], br(),
-            strong("Salary :"), 
-            scenario$Data$X17p[index], br(),
-            strong("Tot Annual Cost :"), 
-            scenario$Data$InStOff[index])
+        place_card(index)
       })
     }
   })
+  #Clear All choice boxes
   observeEvent(input$clear_all, {
     output$row.choice.table1 <- renderUI(NULL)
     output$row.choice.table2 <- renderUI(NULL)
     output$row.choice.table3 <- renderUI(NULL)
   })
-  
+  #Save scenario
   observeEvent(input$save_scenario,{
     filename <- paste0(input$userName, ".rds")
-    saveRDS(scenario$Data, filename)
+    saveRDS(scenario_temp, filename)
     drop_upload(filename, path = "responses")
     shinyalert(title = "Saved!", type = "success")
   })
+  #Load scenario
   observeEvent(input$load_scenario, {
     filename2 <- paste0("responses/",input$userName, ".rds")
     if(drop_exists(filename2) == FALSE) {
       shinyalert(title = "File Not Found", type = "error")
     } else {
-#      filename2 <- paste0("responses", filename)
+      #      filename2 <- paste0("responses", filename)
       drop_download(filename2, overwrite = TRUE)
       filename <- paste0(input$userName, ".rds")
-      scenario$Data <- readRDS(filename)
+      scenario_temp <<- readRDS(filename)
       shinyalert(title = "Loaded", type = "success")
     } 
   })
