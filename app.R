@@ -105,6 +105,7 @@ body <- dashboardBody(
                     h4("Skills assessment:", a("https://www.careeronestop.org/", href = "https://www.careeronestop.org/", target = "_blank")),
                     h4("Advanced Skills assessment:", a("https://www.wowi.com/", href = "https://www.wowi.com/", target = "_blank")),
                     h4("What do you want to do for a living?", a("https://www.mynextmove.org/", href = "https://www.mynextmove.org/", target = "_blank")),
+                    h4("Occupational outlook handbook?", a("https://www.bls.gov/ooh/", href = "https://www.bls.gov/ooh/")),
                     h4("School comparison and Research Tool", a("https://nces.ed.gov/collegenavigator/", href = "https://nces.ed.gov/collegenavigator/", target = "_blank"))
                 )),
               box(width = 4,
