@@ -26,7 +26,6 @@ drop_auth(rdstoken = "droptoken.rds")
 # Then pass the token to each drop_ function
 #drop_acc(dtoken = token)
 
-selectedrowindex = 0
 #Read in main data table from your local directory
 #master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
@@ -38,40 +37,64 @@ cip1 <- cip2[order(cip2$CIP_Category),]
 #Read soc data table and order alphabetically
 soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
-#scenarios <- NULL
-# Main login screen
-#scenario <- colnames(master1)
 #Credentials
-#usernames <- c("Epic","John","Lynn","Steven","Generic")
-
 #credentials = data.frame(
 #  username_id = "Epic",
 #  passod   = sapply("pass1",password_store),
 #  permission  = c("advanced"), 
-#  stringsAsFactors = F
-#)
+#  stringsAsFactors = F)
 #saveRDS(credentials, "cred.rds")
 #drop_upload("cred.rds", path = "responses")
 drop_download("responses/cred.rds", overwrite = TRUE)
 credentials <- readRDS("cred.rds")
 
+# Data frame to convert degree code to number of years for degree
+deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"N/A")
+#years <- c(.8,1.5,2,3,4,5,6,7,3,5,10,7,8,0)
+years <- c(1,2,2,3,4,5,6,7,3,5,10,7,8,0)
+num.years <- data.frame(deg.code, years, stringsAsFactors = FALSE)
+
+pc_index1 <- 0
+pc_index2 <- 0
+pc_index3 <- 0
+roi_table <- data.frame(total_cost = numeric(), total_wages = numeric())
+
+#place_card <- function(index){
+#  pcresult <- box(width = 4,
+#                  strong("Occupation :"), 
+#                  scenario_temp$occ.name[index], br(),
+#                  strong("School :"), 
+#                  scenario_temp$school.name[index], br(),
+#                  strong("Curriculum :"), 
+#                  scenario_temp$cip.name[index], br(),
+#                  strong("Degree :"), 
+#                  scenario_temp$degree.name[index], br(),
+#                  strong("Salary :"), 
+#                  scenario_temp$X17p[index], br(),
+#                  strong("Tot Annual Cost :"), 
+#                  scenario_temp$InStOff[index])
+#  return(pcresult)
+#}
 place_card <- function(index){
+  dc <- scenario_temp$degree.code[index]
+  nyear <- filter(num.years, deg.code %in% dc) %>% select(years)
   pcresult <- box(width = 4,
-                  strong("Occupation :"), 
-                  scenario_temp$occ.name[index], br(),
                   strong("School :"), 
                   scenario_temp$school.name[index], br(),
                   strong("Curriculum :"), 
                   scenario_temp$cip.name[index], br(),
                   strong("Degree :"), 
                   scenario_temp$degree.name[index], br(),
+                  strong("Number of years: "),(nyear),br(),
+                  strong("Annual Cost :"),
+                  scenario_temp$InStOff[index], br(), br(),
+                  strong("Occupation :"), 
+                  scenario_temp$occ.name[index], br(),
                   strong("Salary :"), 
-                  scenario_temp$X17p[index], br(),
-                  strong("Tot Annual Cost :"), 
-                  scenario_temp$InStOff[index])
+                  scenario_temp$X17p[index])
+                  
   return(pcresult)
 }
-
 header <- dashboardHeader( title = "E.P.I.C. Planning", titleWidth = 230, uiOutput("logoutbtn"))
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 body <- dashboardBody(
@@ -236,7 +259,7 @@ body <- dashboardBody(
                   actionButton(inputId = "clear_all", label = "Clear all Scenarios", width = '100%')),
               
               box(width = 2,
-                  numericInput(inputId = "num_years", label = "Number of years to chart", value = 4, min = 1, max = 70 )),
+                  numericInput(inputId = "num_years", label = "Number of years to chart", value = 25, min = 1, max = 52 )),
               box(width = 2,
                   strong("Press to create Graph"),br(),
                   actionButton(inputId = "create_data", label = "Go", width = '100%'))
@@ -415,7 +438,8 @@ server <- function(input, output, session) {
   observeEvent(input$delete_scenario, {
     if(length(input$epic.scenarios.table_rows_selected)>= 1){
       scenario_temp <<- scenario_temp[-input$epic.scenarios.table_rows_selected,]
-      row.names(scenario_temp) <<- 1:nrow(scenario_temp)
+      if(nrow(scenario_temp)>= 1){
+        row.names(scenario_temp) <<- 1:nrow(scenario_temp)}
     }
   })
   #Filter for First Table
@@ -486,26 +510,26 @@ server <- function(input, output, session) {
   #Table prep with filters and Column choices for second table
 
   observeEvent(input$add_one_compare, {
-    index <- input$epic.scenarios.table_rows_selected
-    if(!is.null(index)) {
+    pc_index1 <<- input$epic.scenarios.table_rows_selected
+    if(!is.null(pc_index1)) {
       output$row.choice.table1 <- renderUI({
-        place_card(index)
+        place_card(pc_index1)
       })
     }
   })
   observeEvent(input$add_two_compare, {
-    index <- input$epic.scenarios.table_rows_selected
-    if(!is.null(index)) {
+    pc_index2 <<- input$epic.scenarios.table_rows_selected
+    if(!is.null(pc_index2)) {
       output$row.choice.table2 <- renderUI({
-        place_card(index)
+        place_card(pc_index2)
       })
     }
   })
   observeEvent(input$add_three_compare, {
-    index <- input$epic.scenarios.table_rows_selected
-    if(!is.null(index)) {
+    pc_index3 <<- input$epic.scenarios.table_rows_selected
+    if(!is.null(pc_index3)) {
       output$row.choice.table3 <- renderUI({
-        place_card(index)
+        place_card(pc_index3)
       })
     }
   })
@@ -514,6 +538,12 @@ server <- function(input, output, session) {
     output$row.choice.table1 <- renderUI(NULL)
     output$row.choice.table2 <- renderUI(NULL)
     output$row.choice.table3 <- renderUI(NULL)
+    pc_index1 <<- 0
+    pc_index2 <<- 0
+    pc_index3 <<- 0
+  })
+  observeEvent(input$create_data,{
+    
   })
   #Save scenario
   observeEvent(input$save_scenario,{
