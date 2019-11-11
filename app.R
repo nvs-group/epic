@@ -34,10 +34,10 @@ selectedrowindex = 0
 
 # load data from database -----
 
-sqlitePath <- "data/epicdb.sqlite"
-table <- "master1"
+sqlitePath <- "data/epic_20191111.sqlite"
+#table <- "master1"
 
-loadData <- function () {
+loadData <- function (table) {
   # connect to db
   db <- dbConnect(SQLite(), sqlitePath)
   # construct the fecting query
@@ -48,15 +48,17 @@ loadData <- function () {
   data
 }
 
-master1 <- loadData()
+master1 <- loadData("master1")
+soc2 <- loadData("soc_code")
+cip2 <- loadData("cip_code")
 
 # master1 <- read.csv("Master1.csv", stringsAsFactors = FALSE)
 scenario_temp <- master1[FALSE,]
 #Read cip data table and order alphabetically
-cip2 <- read_tsv("cip_code.txt")
+#cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
 #Read soc data table and order alphabetically
-soc2 <- read_tsv("soc_code.txt")
+#soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 
 
@@ -69,14 +71,14 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #Credentials
 #usernames <- c("Epic","John","Lynn","Steven","Generic")
 
-#credentials = data.frame(
+# credentials = data.frame(
 #  username_id = "Epic",
 #  passod   = sapply("pass1",password_store),
-#  permission  = c("advanced"), 
+#  permission  = c("advanced"),
 #  stringsAsFactors = F
-#)
-#saveRDS(credentials, "cred.rds")
-#drop_upload("cred.rds", path = "responses")
+# )
+# saveRDS(credentials, "cred.rds")
+# drop_upload("cred.rds", path = "responses")
 drop_download("responses/cred.rds", overwrite = TRUE)
 credentials <- readRDS("cred.rds")
 

@@ -43,3 +43,11 @@ Overview for data persistence goal:
 
 Need to check on school.name field, did it transfer ok?  Is it newer than the epicdb.sqlite file? Do I need to create a new epicdb.sqlite database?  
 Also need to create or tables for the soc and cip
+
+2019 11 11 13:39 - re-imported the csv file from the zip file into sqlite, and the app runs great.
+Had to use Epic username to get in
+So, success in loading the master1 file
+Let me move on to SOC, CIP - added these as separate tables within the database
+
+Need to know what the user_data structure is to capture user preferences
+
