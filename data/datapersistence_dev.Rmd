@@ -12,8 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Overview for data persistence goal:
 1. Select dev server
 2. Install sqlite (mysql?)
+  + sudo su - -c "R -e \"install.packages('RSQLite', repos='http://cran.rstudio.com/')\""
 3. Transfer data to sql
-  + transfer Master1
+  + transfer Master1 (copied epicdb.sqlite file from Dropbox/R-Studio/EPIC-old/data)
   + cip1
   + soc1
 4. Alter any code?

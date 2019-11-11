@@ -18,7 +18,7 @@ library(lubridate)
 library(shinyalert)
 library(rdrop2)
 library(assertive)
-library(RMySQL)
+library(RSQLite)
 
 #token <- drop_auth()
 #saveRDS(token, "droptoken.rds")
@@ -33,7 +33,22 @@ selectedrowindex = 0
 ################## new way to read in comma delineated file on locate machine.
 
 # load data from database -----
-master1 <- read.csv("Master1.csv", stringsAsFactors = FALSE)
+
+sqlitePath <- "data/epicdb.sqlite"
+table <- "master1"
+
+master1 <- function () {
+  # connect to db
+  db <- dbConnect(SQLite(), sqlitePath)
+  # construct the fecting query
+  query <- sprintf("SELECT * FROM %s", table)
+  # submit the fect query and disconnect
+  data <- dbGetQuery(db, query)
+  dbDisconnect(db)
+  data
+}
+
+# master1 <- read.csv("Master1.csv", stringsAsFactors = FALSE)
 scenario_temp <- master1[FALSE,]
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
