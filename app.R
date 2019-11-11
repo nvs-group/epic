@@ -37,7 +37,7 @@ selectedrowindex = 0
 sqlitePath <- "data/epicdb.sqlite"
 table <- "master1"
 
-master1 <- function () {
+loadData <- function () {
   # connect to db
   db <- dbConnect(SQLite(), sqlitePath)
   # construct the fecting query
@@ -47,6 +47,8 @@ master1 <- function () {
   dbDisconnect(db)
   data
 }
+
+master1 <- loadData()
 
 # master1 <- read.csv("Master1.csv", stringsAsFactors = FALSE)
 scenario_temp <- master1[FALSE,]

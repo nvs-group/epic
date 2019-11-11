@@ -12,9 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 Overview for data persistence goal:
 1. Select dev server
 2. Install sqlite (mysql?)
-  + sudo su - -c "R -e \"install.packages('RSQLite', repos='http://cran.rstudio.com/')\""
 3. Transfer data to sql
-  + transfer Master1 (copied epicdb.sqlite file from Dropbox/R-Studio/EPIC-old/data)
+  + transfer Master1 
   + cip1
   + soc1
 4. Alter any code?
@@ -33,4 +32,14 @@ Overview for data persistence goal:
 
 # Install Sqlite or MySQL
 * SQLite is probably a sufficient sql engine for the number of users we expect and to avoid the upkeep of MySQL
-* 
++ sudo su - -c "R -e \"install.packages('RSQLite', repos='http://cran.rstudio.com/')\""
+
+# Transfer data to sql
+* copied epicdb.sqlite file from Dropbox/R-Studio/EPIC-old/data
+
+## 2019 11 11 - first run app() results:
+> Listening on http://127.0.0.1:4886  
+> Warning: Error in %in%: object 'school.name' not found
+
+Need to check on school.name field, did it transfer ok?  Is it newer than the epicdb.sqlite file? Do I need to create a new epicdb.sqlite database?  
+Also need to create or tables for the soc and cip
