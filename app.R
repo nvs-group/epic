@@ -24,8 +24,8 @@ library(googleAuthR)
 
 #options(googleAuthR.scopes.selected = c("https://www.googleapis.com/auth/userinfo.email",
 #                                        "https://www.googleapis.com/auth/userinfo.profile"))
-options("googleAuthR.webapp.client_id" = "498179002384-c198jidv7geni0dfq3ms99u91qnvbkkk.apps.googleusercontent.com")
-options("googleAuthR.webapp.client_secret" = "dAg9v73seuxCo-zynwwoRhjQ")
+options("googleAuthR.webapp.client_id" = "")
+options("googleAuthR.webapp.client_secret" = "")
 
 
 
