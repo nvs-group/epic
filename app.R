@@ -1,5 +1,6 @@
 ## app.R ##
 library(shiny)
+options(shiny.port = 1221)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinydashboardPlus)
@@ -19,11 +20,19 @@ library(shinyalert)
 library(rdrop2)
 library(assertive)
 library(RSQLite)
+library(googleAuthR)
+
+#options(googleAuthR.scopes.selected = c("https://www.googleapis.com/auth/userinfo.email",
+#                                        "https://www.googleapis.com/auth/userinfo.profile"))
+options("googleAuthR.webapp.client_id" = "498179002384-c198jidv7geni0dfq3ms99u91qnvbkkk.apps.googleusercontent.com")
+options("googleAuthR.webapp.client_secret" = "dAg9v73seuxCo-zynwwoRhjQ")
+
+
 
 #token <- drop_auth()
 #saveRDS(token, "droptoken.rds")
-token <- readRDS("droptoken.rds")
-drop_auth(rdstoken = "droptoken.rds")
+#token <- readRDS("droptoken.rds")
+#drop_auth(rdstoken = "droptoken.rds")
 # Then pass the token to each drop_ function
 #drop_acc(dtoken = token)
 
@@ -127,8 +136,8 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 # )
 # saveRDS(credentials, "cred.rds")
 # drop_upload("cred.rds", path = "responses")
-drop_download("responses/cred.rds", overwrite = TRUE)
-credentials <- readRDS("cred.rds")
+#drop_download("responses/cred.rds", overwrite = TRUE)
+#credentials <- readRDS("cred.rds")
 
 place_card <- function(index){
   pcresult <- box(width = 4,
@@ -335,6 +344,8 @@ body <- dashboardBody(
             div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
                 wellPanel(
                   tags$h2("LOG IN", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+                  googleAuthUI("gauth_login"),
+                  
                   textInput("userName", placeholder="Username", label = tagList(icon("user"), "Username")),
                   passwordInput("passwd", placeholder="Password", label = tagList(icon("unlock-alt"), "Password")),
                   br(),
@@ -362,31 +373,55 @@ ui <- dashboardPagePlus(header, sidebar, body, skin = "blue")
 
 server <- function(input, output, session) {
   
-  login <- FALSE
-  USER <- reactiveValues(login = login)
+#  login <- FALSE
+#  USER <- reactiveValues(login = login)
+  USER <- reactiveValues(login = FALSE)
   
-  observeEvent(input$login,{
-    if (USER$login == FALSE) {
-      Username <- isolate(input$userName)
-      Password <- isolate(input$passwd)
-      if(length(which(credentials$username_id==Username))==1) { 
-        pasmatch  <- credentials["passod"][which(credentials$username_id==Username),]
-        pasverify <- password_verify(pasmatch, Password)
-        if(pasverify) {
-          USER$login <- TRUE
-        } else {
-          shinyalert(title = "Username or Password incorrect", type = "error")
-        }
-      } else {
-        shinyalert(title = "Username or Password incorrect", type = "error")
-      }
-    } 
-  })
+## Authentication, original copied from https://lesliemyint.wordpress.com/2017/01/01/creating-a-shiny-app-with-google-login/
+  
+accessToken <- callModule(googleAuth, "gauth_login",
+                          login_class = "btn btn-primary",
+                          logout_class = "btn btn-primary")
+userDetails <- reactive({
+  validate(
+    need(accessToken(), "not logged in")
+  )
+  USER$login <- TRUE
+  with_shiny(get_user_info, shiny_access_token = accessToken())
+})
+
+## Display user's Google display name after successful login
+output$display_username <- renderText({
+  validate(
+    need(userDetails(), "getting user details")
+  )
+  userDetails()$displayName
+})
+  
+  
+  
+  # observeEvent(input$login,{
+  #   if (USER$login == FALSE) {
+  #     Username <- isolate(input$userName)
+  #     Password <- isolate(input$passwd)
+  #     if(length(which(credentials$username_id==Username))==1) { 
+  #       pasmatch  <- credentials["passod"][which(credentials$username_id==Username),]
+  #       pasverify <- password_verify(pasmatch, Password)
+  #       if(pasverify) {
+  #         USER$login <- TRUE
+  #       } else {
+  #         shinyalert(title = "Username or Password incorrect", type = "error")
+  #       }
+  #     } else {
+  #       shinyalert(title = "Username or Password incorrect", type = "error")
+  #     }
+  #   } 
+  # })
   output$logoutbtn <- renderUI({
     req(USER$login)
-    tags$li(a(icon("fa fa-sign-out"), "Logout", 
+    tags$li(a(icon("fa fa-sign-out"), "Logout",
               href="javascript:window.location.reload(true)"),
-            class = "dropdown", 
+            class = "dropdown",
             style = "background-color: #eee !important; border: 0;
                     font-weight: bold; margin:5px; padding: 10px;")
   })

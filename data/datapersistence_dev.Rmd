@@ -89,3 +89,17 @@ dbGetQuery(db, "SELECT * FROM accounts")
 ```
 
 Next step: Try to insert user from the Create Account popup 
+
+
+Wait a minute ... what about google authentication?  Isn't this better than creating our own authentication? In terms of updating passwords, hashing passwords, security, resetting?  
+```{r}
+library(googleAuthR)
+# starts auth process with defaults
+gar_auth()
+#>The googleAuthR package is requesting access to your Google account. Select a 
+#> pre-authorised account or enter '0' to obtain a new token. Press Esc/Ctrl + C to abort.
+
+#> 1: mark@work.com
+#> 2: home@home.com
+```
+
