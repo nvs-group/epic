@@ -50,4 +50,42 @@ So, success in loading the master1 file
 Let me move on to SOC, CIP - added these as separate tables within the database
 
 Need to know what the user_data structure is to capture user preferences
+### User data table
+<!-- Sources -->
+<!-- https://github.com/datastorm-open/shinymanager -->
+<!-- https://github.com/paulc91/shinyauthr -->
 
+acct_id: user id
+user_name: login name
+user_password: login password
+acct_admin: "no" or "yes"
+acct_email: email address
+acct_created: date-time of creation
+
+Successfully wrote to db using following code:
+
+```{r}
+
+
+ data_test <- data.frame(
+   acct_first_last = "John Chapman",
+   user_name = "Juancito",
+   user_password = sapply("pass1",password_store),
+   acct_email = "juancito@benitosburritos.com",
+   acct_admin = "No",
+   acct_created = as.character(Sys.time()),
+  stringsAsFactors = FALSE
+ )
+
+sqlitePath <- "data/epic_20191111.sqlite"
+
+db <- dbConnect(SQLite(), sqlitePath)
+dbWriteTable(db,"accounts", data_test, append = TRUE)
+
+# check results ----
+dbListTables(db)
+dbGetQuery(db, "SELECT * FROM accounts")
+
+```
+
+Next step: Try to insert user from the Create Account popup 

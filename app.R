@@ -48,6 +48,54 @@ loadData <- function (table) {
   data
 }
 
+# Save data to database ----
+# saveData <- function(table, data) {
+#   # Connect to the database
+#   db <- dbConnect(SQLite(), sqlitePath)
+#   # Construct the update query by looping over the data fields
+#   query <- sprintf(
+#     "INSERT INTO %s (%s) VALUES ('%s')",
+#     table, 
+#     paste(names(data), collapse = ", "),
+#     paste(data, collapse = "', '")
+#   )
+#   # Submit the update query and disconnect
+#   dbGetQuery(db, query)
+#   dbDisconnect(db)
+# }
+
+
+# data_test <- data.frame(
+#   acct_first_last = input[[paste0("Names_add", input$Add_row_head)]],
+#   user_name = input[[paste0("Username_add", input$Add_row_head)]],
+#   user_password = sapply(input[[paste0("Password_add", input$Add_row_head)]],password_store),
+#   acct_email = input[[paste0("Email_add", input$Add_row_head)]],
+#   acct_admin = "No",
+#   acct_created = Sys.time(),
+#   stringsAsFactors = FALSE
+# )
+# data_test <- data.frame(
+#   acct_first_last = "John Chapman",
+#   user_name = "Juancito",
+#   user_password = sapply("pass1",password_store),
+#   acct_email = "juancito@benitosburritos.com",
+#   acct_admin = "No",
+#   acct_created = as.character(Sys.time()),
+#   stringsAsFactors = FALSE
+# )
+
+# saveData(accounts, data_test)
+# Write a table by appending the data frames 
+# db <- dbConnect(SQLite(), sqlitePath)
+# dbWriteTable(db,"accounts", data_test, append = TRUE)
+# 
+# dbListTables(db)
+# dbGetQuery(db, "SELECT * FROM accounts")
+
+
+
+# load master1, soc, cip data ----
+
 master1 <- loadData("master1")
 soc2 <- loadData("soc_code")
 cip2 <- loadData("cip_code")
@@ -542,14 +590,14 @@ server <- function(input, output, session) {
     output$row.choice.table2 <- renderUI(NULL)
     output$row.choice.table3 <- renderUI(NULL)
   })
-  #Save scenario
+  # Save scenario ----
   observeEvent(input$save_scenario,{
     filename <- paste0(input$userName, ".rds")
     saveRDS(scenario_temp, filename)
     drop_upload(filename, path = "responses")
     shinyalert(title = "Saved!", type = "success")
   })
-  #Load scenario
+  #Load scenario ----
   observeEvent(input$load_scenario, {
     filename2 <- paste0("responses/",input$userName, ".rds")
     if(drop_exists(filename2) == FALSE) {
@@ -565,22 +613,38 @@ server <- function(input, output, session) {
   observeEvent(input$add_user, {
     ### This is the pop up board for input a new row
     showModal(modalDialog(title = "Add a new account",
-                          textInput(paste0("Names_add", input$Add_row_head), "Name"),
-                          textInput(paste0("Password_add", input$Add_row_head), "Password"), 
-                          actionButton("go", "Add item"),
+                          textInput(paste0("Names_add", input$Add_row_head), "First and Last Name"),
+                          textInput(paste0("Username_add", input$Add_row_head), "Username"),
+                          textInput(paste0("Password_add", input$Add_row_head), "Password"),
+                          textInput(paste0("Email_add", input$Add_row_head), "Email"),
+                          actionButton("go", "Add account"),
                           easyClose = TRUE, footer = NULL ))
   })
   ### Add a new row to DT  
   observeEvent(input$go, {
     new_row=data.frame(
-      username_id = input[[paste0("Names_add", input$Add_row_head)]],
-      passod = sapply(input[[paste0("Password_add", input$Add_row_head)]],password_store),
-      permission = "advanced",
+      acct_first_last = input[[paste0("Names_add", input$Add_row_head)]],
+      user_name = input[[paste0("Username_add", input$Add_row_head)]],
+      user_password = sapply(input[[paste0("Password_add", input$Add_row_head)]],password_store),
+      acct_email = input[[paste0("Email_add", input$Add_row_head)]],
+      acct_admin = "No",
+      acct_created = as.character(Sys.time()),
       stringsAsFactors = FALSE
     )
-    credentials <<- rbind(credentials, new_row)
-    saveRDS(credentials, "cred.rds")
-    drop_upload("cred.rds", path = "responses")
+    #credentials <<- rbind(credentials, new_row)
+    #saveRDS(credentials, "cred.rds")
+    #drop_upload("cred.rds", path = "responses")
+    
+    
+    ## load new user to accounts db ----
+    db <- dbConnect(SQLite(), sqlitePath)
+    dbWriteTable(db,"accounts", new_row, append = TRUE)
+
+    # dbListTables(db)
+    # dbGetQuery(db, "SELECT * FROM ")
+
+    
+    
     removeModal()
   })
 }
