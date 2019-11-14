@@ -58,6 +58,11 @@ pc_index1 <- 0
 pc_index2 <- 0
 pc_index3 <- 0
 roi_table <- data.frame(total_cost = numeric(), total_wages = numeric())
+cummulative_table <- data.frame(total_1 = numeric())
+raw_table <- data.frame(option_1 = numeric())
+running_total <- 0
+career_years <- 0
+
 
 #place_card <- function(index){
 #  pcresult <- box(width = 4,
@@ -95,6 +100,42 @@ place_card <- function(index){
                   
   return(pcresult)
 }
+init_variables <- function(){
+  cummulative_table <<- data.frame(total_1 = numeric())
+  raw_table <<- data.frame(option_1 = numeric())
+}
+school_cost <- function(index){
+  year_change <- 0
+  running_total <<- 0
+  dc <- scenario_temp$degree.code[index]
+  nyear <- as.numeric(filter(num.years, deg.code %in% dc) %>% select(years))
+  print(nyear)
+  annual_cost <- scenario_temp$InStOff[index]
+  for(i in (1:nyear)){
+    year_change <- round(annual_cost, 0)
+    raw_table <<- rbind(raw_table, year_change)
+    running_total <<- round((running_total - annual_cost),0)
+    cummulative_table <<- rbind(cummulative_table, running_total)
+  }
+  return()
+}
+career_income <- function(index){
+  year_change <- scenario_temp$X17p[index]
+  occf <- scenario_temp$MedOccF[index]
+  raw_table <<- rbind(raw_table, year_change)
+  running_total <<- running_total + year_change
+  cummulative_table <<- rbind(cummulative_table, running_total)
+  for(i in (1:career_years)){
+    tf <- (1 + ((0.0002 * ((i) ^ 2)) - 0.0023 * (i) + 0.0603))
+    year_change <- year_change * tf * occf
+    raw_table <<- rbind(raw_table, year_change)
+    running_total <<- running_total + year_change
+    cummulative_table <<- rbind(cummulative_table, running_total)
+  }
+  return()
+  
+}
+
 header <- dashboardHeader( title = "E.P.I.C. Planning", titleWidth = 230, uiOutput("logoutbtn"))
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 body <- dashboardBody(
@@ -514,6 +555,7 @@ server <- function(input, output, session) {
     if(!is.null(pc_index1)) {
       output$row.choice.table1 <- renderUI({
         place_card(pc_index1)
+
       })
     }
   })
@@ -543,7 +585,16 @@ server <- function(input, output, session) {
     pc_index3 <<- 0
   })
   observeEvent(input$create_data,{
-    
+    if(pc_index1 > 0) {
+      init_variables()
+      school_cost(pc_index1)
+      dc <- scenario_temp$degree.code[pc_index1]
+      nyear <- filter(num.years, deg.code %in% dc) %>% select(years)
+      career_years <<- as.numeric(input$num_years - nyear - 1)
+      career_income(pc_index1)
+      print(cummulative_table)
+      print(raw_table)
+    }
   })
   #Save scenario
   observeEvent(input$save_scenario,{
