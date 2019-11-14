@@ -1,5 +1,6 @@
 ## app.R ##
 library(shiny)
+options(shiny.port = 1221)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinydashboardPlus)
@@ -19,6 +20,14 @@ library(shinyalert)
 library(rdrop2)
 library(assertive)
 library(RSQLite)
+library(googleAuthR)
+
+#options(googleAuthR.scopes.selected = c("https://www.googleapis.com/auth/userinfo.email",
+#                                        "https://www.googleapis.com/auth/userinfo.profile"))
+#options("googleAuthR.webapp.client_id" = "")
+#options("googleAuthR.webapp.client_secret" = "")
+
+
 
 #token <- drop_auth()
 #saveRDS(token, "droptoken.rds")
@@ -308,6 +317,7 @@ body <- dashboardBody(
             div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
                 wellPanel(
                   tags$h2("LOG IN", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+
                   textInput("userName", placeholder="Username", label = tagList(icon("user"), "Username")),
                   passwordInput("passwd", placeholder="Password", label = tagList(icon("unlock-alt"), "Password")),
                   br(),
@@ -326,6 +336,7 @@ body <- dashboardBody(
                                  padding: 10px 15px; width: 200px; cursor: pointer;
                                  font-size: 16px; font-weight: 600;"),
                     br()
+                    # Input Google Authentication here (googleAuthR)
                   )
                   )
             ))
@@ -339,8 +350,9 @@ ui <- dashboardPagePlus(header, sidebar, body, skin = "blue")
 ## server function ----
 server <- function(input, output, session) {
   
-  login <- FALSE
-  USER <- reactiveValues(login = login)
+#  login <- FALSE
+#  USER <- reactiveValues(login = login)
+  USER <- reactiveValues(login = FALSE)
   
   observeEvent(input$login,{
     if (USER$login == FALSE) {
@@ -349,7 +361,6 @@ server <- function(input, output, session) {
       Password <- isolate(input$passwd)
       
       # query db for username
-      conn <- dbConnect(RSQLite::SQLite(), "data/epic.sqlite")
       result <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = Username)
       if(nrow(result) < 1) {
         shinyalert(title = "Username or Password incorrect", type = "error")
@@ -377,11 +388,32 @@ server <- function(input, output, session) {
       # }
     } 
   })
+
+  
+  
+  # observeEvent(input$login,{
+  #   if (USER$login == FALSE) {
+  #     Username <- isolate(input$userName)
+  #     Password <- isolate(input$passwd)
+  #     if(length(which(credentials$username_id==Username))==1) { 
+  #       pasmatch  <- credentials["passod"][which(credentials$username_id==Username),]
+  #       pasverify <- password_verify(pasmatch, Password)
+  #       if(pasverify) {
+  #         USER$login <- TRUE
+  #       } else {
+  #         shinyalert(title = "Username or Password incorrect", type = "error")
+  #       }
+  #     } else {
+  #       shinyalert(title = "Username or Password incorrect", type = "error")
+  #     }
+  #   } 
+  # })
+
   output$logoutbtn <- renderUI({
     req(USER$login)
-    tags$li(a(icon("fa fa-sign-out"), "Logout", 
+    tags$li(a(icon("fa fa-sign-out"), "Logout",
               href="javascript:window.location.reload(true)"),
-            class = "dropdown", 
+            class = "dropdown",
             style = "background-color: #eee !important; border: 0;
                     font-weight: bold; margin:5px; padding: 10px;")
   })
@@ -631,9 +663,15 @@ server <- function(input, output, session) {
     #drop_upload("cred.rds", path = "responses")
     
     
-    ## load new user to accounts db ----
-    dbWriteTable(conn,"accounts", new_row, append = TRUE)
-
+    ## check if username already exists
+    username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = Username)
+    if(nrow(uname_exist) > 0) {
+      shinyalert(title = "Username already used", type = "error")
+    } else {
+      ## load new user to accounts db ----
+      dbWriteTable(conn,"accounts", new_row, append = TRUE)
+    }
+    
 
     removeModal()
   })

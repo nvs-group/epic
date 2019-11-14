@@ -89,3 +89,29 @@ dbGetQuery(db, "SELECT * FROM accounts")
 ```
 
 Next step: Try to insert user from the Create Account popup 
+
+
+Wait a minute ... what about google authentication?  Isn't this better than creating our own authentication? In terms of updating passwords, hashing passwords, security, resetting?  
+```{r}
+library(googleAuthR)
+# starts auth process with defaults
+gar_auth()
+#>The googleAuthR package is requesting access to your Google account. Select a 
+#> pre-authorised account or enter '0' to obtain a new token. Press Esc/Ctrl + C to abort.
+
+#> 1: mark@work.com
+#> 2: home@home.com
+```
+
+
+Turns out there is a big problem with using a proxy server (nginx) while testing Google Authentication in RStudio server.  The proxy server changes the URL with a /p/236432/ addition to the URL.  I can't get Google to recognize the URL and so Google throws errors when I try to develop the code.  BUT, prileminary coding suggests this is definitel the way to go in a future version.  And, we can pull the user's email, and basic profile info (name?) directly from Google.  
+So, I'm suggesting we don't do this for the initial build.
+
+
+## sqlite authentication
+I was able to build sql authentication into the development version of the app.
+I commented out the dropbox credentialing code
+I can
+* create a new user using the "create Account" box
++ check if username already exsts, if yes, then error message, if not, then add to database
+* log in with the new user
