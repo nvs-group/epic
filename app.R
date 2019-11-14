@@ -22,8 +22,8 @@ library(RSQLite)
 
 #token <- drop_auth()
 #saveRDS(token, "droptoken.rds")
-token <- readRDS("droptoken.rds")
-drop_auth(rdstoken = "droptoken.rds")
+#token <- readRDS("droptoken.rds")
+#drop_auth(rdstoken = "droptoken.rds")
 # Then pass the token to each drop_ function
 #drop_acc(dtoken = token)
 
@@ -33,47 +33,20 @@ selectedrowindex = 0
 ################## new way to read in comma delineated file on locate machine.
 
 # load data from database -----
-
-sqlitePath <- "data/epic_20191111.sqlite"
-#table <- "master1"
+# path to sqlite db
+sqlitePath <- "data/epic.sqlite"
+# connect to db
+conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
 
 loadData <- function (table) {
-  # connect to db
-  db <- dbConnect(SQLite(), sqlitePath)
   # construct the fecting query
   query <- sprintf("SELECT * FROM %s", table)
   # submit the fect query and disconnect
-  data <- dbGetQuery(db, query)
-  dbDisconnect(db)
+  data <- dbGetQuery(conn, query)
+  #dbDisconnect(conn)
   data
 }
 
-# Save data to database ----
-# saveData <- function(table, data) {
-#   # Connect to the database
-#   db <- dbConnect(SQLite(), sqlitePath)
-#   # Construct the update query by looping over the data fields
-#   query <- sprintf(
-#     "INSERT INTO %s (%s) VALUES ('%s')",
-#     table, 
-#     paste(names(data), collapse = ", "),
-#     paste(data, collapse = "', '")
-#   )
-#   # Submit the update query and disconnect
-#   dbGetQuery(db, query)
-#   dbDisconnect(db)
-# }
-
-
-# data_test <- data.frame(
-#   acct_first_last = input[[paste0("Names_add", input$Add_row_head)]],
-#   user_name = input[[paste0("Username_add", input$Add_row_head)]],
-#   user_password = sapply(input[[paste0("Password_add", input$Add_row_head)]],password_store),
-#   acct_email = input[[paste0("Email_add", input$Add_row_head)]],
-#   acct_admin = "No",
-#   acct_created = Sys.time(),
-#   stringsAsFactors = FALSE
-# )
 # data_test <- data.frame(
 #   acct_first_last = "John Chapman",
 #   user_name = "Juancito",
@@ -127,8 +100,8 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 # )
 # saveRDS(credentials, "cred.rds")
 # drop_upload("cred.rds", path = "responses")
-drop_download("responses/cred.rds", overwrite = TRUE)
-credentials <- readRDS("cred.rds")
+#drop_download("responses/cred.rds", overwrite = TRUE)
+#credentials <- readRDS("cred.rds")
 
 place_card <- function(index){
   pcresult <- box(width = 4,
@@ -358,8 +331,12 @@ body <- dashboardBody(
             ))
   )
 )
+
+## UI ----
 ui <- dashboardPagePlus(header, sidebar, body, skin = "blue")
 
+
+## server function ----
 server <- function(input, output, session) {
   
   login <- FALSE
@@ -367,19 +344,37 @@ server <- function(input, output, session) {
   
   observeEvent(input$login,{
     if (USER$login == FALSE) {
+      # pull username and password from user input
       Username <- isolate(input$userName)
       Password <- isolate(input$passwd)
-      if(length(which(credentials$username_id==Username))==1) { 
-        pasmatch  <- credentials["passod"][which(credentials$username_id==Username),]
-        pasverify <- password_verify(pasmatch, Password)
-        if(pasverify) {
+      
+      # query db for username
+      conn <- dbConnect(RSQLite::SQLite(), "data/epic.sqlite")
+      result <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = Username)
+      if(nrow(result) < 1) {
+        shinyalert(title = "Username or Password incorrect", type = "error")
+      } else {
+        if(password_verify(result$user_password,Password)) {
           USER$login <- TRUE
         } else {
           shinyalert(title = "Username or Password incorrect", type = "error")
         }
-      } else {
-        shinyalert(title = "Username or Password incorrect", type = "error")
       }
+      
+      
+      
+      
+      # if(length(which(credentials$username_id==Username))==1) { 
+      #   pasmatch  <- credentials["passod"][which(credentials$username_id==Username),]
+      #   pasverify <- password_verify(pasmatch, Password)
+      #   if(pasverify) {
+      #     USER$login <- TRUE
+      #   } else {
+      #     shinyalert(title = "Username or Password incorrect", type = "error")
+      #   }
+      # } else {
+      #   shinyalert(title = "Username or Password incorrect", type = "error")
+      # }
     } 
   })
   output$logoutbtn <- renderUI({
@@ -392,7 +387,7 @@ server <- function(input, output, session) {
   })
   output$sidebarpanel <- renderUI({
     if (USER$login == TRUE ){ 
-      if (credentials[,"permission"][which(credentials$username_id==input$userName)]=="advanced") {
+    #  if (credentials[,"permission"][which(credentials$username_id==input$userName)]=="advanced") {
         sidebarMenu(id = "tabs",
                     menuItem("Home Page",
                              menuSubItem("Instructions", tabName = "instructions")),
@@ -404,7 +399,7 @@ server <- function(input, output, session) {
                     menuItem("Tools", tabName = "tools", icon = icon("toolbox")),
                     menuItem("About", tabName = "about", icon = icon("info"))
         )
-      }
+     # }
     } else {
       sidebarMenu(id = "log_tabs",
                   menuItem("Login", tabName = "login")
@@ -637,14 +632,9 @@ server <- function(input, output, session) {
     
     
     ## load new user to accounts db ----
-    db <- dbConnect(SQLite(), sqlitePath)
-    dbWriteTable(db,"accounts", new_row, append = TRUE)
+    dbWriteTable(conn,"accounts", new_row, append = TRUE)
 
-    # dbListTables(db)
-    # dbGetQuery(db, "SELECT * FROM ")
 
-    
-    
     removeModal()
   })
 }
