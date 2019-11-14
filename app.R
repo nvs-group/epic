@@ -664,12 +664,16 @@ server <- function(input, output, session) {
     
     
     ## check if username already exists
-    username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = input$userName)
-    if(nrow(username_exist) > 0) {
-      shinyalert(title = "Username already used", type = "error")
-    } else {
+    # username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = input$userName)
+    # print(username_exist$user_name)
+    # if(nrow(username_exist) > 0) {
+    #   removeModal()
+    #   shinyalert(title = "Username already used", type = "error")
+    # } else {
       ## load new user to accounts db ----
       dbWriteTable(conn,"accounts", new_row, append = TRUE)
+      # removeModal()
+      # shinyalert(title = "Account created")
     }
     
 
