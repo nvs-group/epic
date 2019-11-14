@@ -3,8 +3,9 @@
 .RData
 .Ruserdata
 data/.gitignore
-data/epicdb.sqlite
+data/epic.sqlite
 data/epic_20191111.sqlite
+Epic.rds
 cred.rds
 Master1.csv
 data/datapersistence_dev.html
