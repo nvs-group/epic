@@ -52,7 +52,7 @@ loadData <- function (table) {
   query <- sprintf("SELECT * FROM %s", table)
   # submit the fect query and disconnect
   data <- dbGetQuery(conn, query)
-  dbDisconnect(conn)
+  #dbDisconnect(conn)
   data
 }
 
@@ -364,7 +364,7 @@ server <- function(input, output, session) {
       conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
       # query db for username
       result <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = Username)
-      dbDisconnect(conn)
+      #dbDisconnect(conn)
       if(nrow(result) < 1) {
         shinyalert(title = "Username or Password incorrect", type = "error")
       } else {
@@ -649,6 +649,7 @@ server <- function(input, output, session) {
                           textInput(paste0("Email_add", input$Add_row_head), "Email"),
                           actionButton("go", "Add account"),
                           easyClose = TRUE, footer = NULL ))
+    
   })
   ### Add a new row to DT  
   observeEvent(input$go, {
@@ -665,25 +666,29 @@ server <- function(input, output, session) {
     #saveRDS(credentials, "cred.rds")
     #drop_upload("cred.rds", path = "responses")
     
-    
     ## check if username already exists
-    # username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = input$userName)
-    # print(username_exist$user_name)
-    # if(nrow(username_exist) > 0) {
-    #   removeModal()
-    #   shinyalert(title = "Username already used", type = "error")
-    # } else {
+    conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
+    
+    #print(new_row$user_name)
+    
+    username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = new_row$user_name)
+    #print(username_exist)
+    if(nrow(username_exist) > 0) {
+      
+      print(username_exist$user_name)
+      #   removeModal()
+      shinyalert(title = "Username already used", type = "error")
+    } else {
       # connect to db
-      conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
-
+      
       ## load new user to accounts db ----
       dbWriteTable(conn,"accounts", new_row, append = TRUE)
       # disconnect DB
-      dbDisconnect(conn)
+      #dbDisconnect(conn)
       
       # removeModal()
       # shinyalert(title = "Account created")
-    #}
+    }
     
 
     removeModal()
