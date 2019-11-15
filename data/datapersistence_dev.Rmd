@@ -130,3 +130,14 @@ Useful commands:
 git clone git@github.com:nvs-group/epic.git datapersistance_dev [in the root of /svr/shiny-server/]
 Also needed to copy the db to the data folder of the app manually
 
+
+### sql scenario save, load
+- created new scenarios table in epic.sqlite
+* exported Epic.rds to csv (write.csv(Epic, "data/scenario.csv"))
+* imported csv into epic.sqlite (via DB Browser for SQLite on Ernestine)
+* for some reason I don't fully understand the import added a first column, I changed that to "acctid" INTEGER, NOT NULL, Primary Key
+
+- insert scenario_temp dataframe into scenarios table
+* stumped, error is not specific enough "Warning: Error in : near "?": syntax error"
+* I'm using correct function (dbExecute)
+* Must be incorrect data type?

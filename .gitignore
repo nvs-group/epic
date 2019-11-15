@@ -5,6 +5,8 @@
 data/.gitignore
 data/epic.sqlite
 data/epic_20191111.sqlite
+data/epic_20191115_1407.sqlite
+data/scenario.csv
 Epic.rds
 cred.rds
 Master1.csv

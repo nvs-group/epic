@@ -20,7 +20,7 @@ library(shinyalert)
 library(rdrop2)
 library(assertive)
 library(RSQLite)
-library(googleAuthR)
+library(DBI)
 
 #options(googleAuthR.scopes.selected = c("https://www.googleapis.com/auth/userinfo.email",
 #                                        "https://www.googleapis.com/auth/userinfo.profile"))
@@ -370,6 +370,7 @@ server <- function(input, output, session) {
       } else {
         if(password_verify(result$user_password,Password)) {
           USER$login <- TRUE
+          user_acct_id <<-  result$acct_id
         } else {
           shinyalert(title = "Username or Password incorrect", type = "error")
         }
@@ -624,8 +625,23 @@ server <- function(input, output, session) {
   observeEvent(input$save_scenario,{
     filename <- paste0(input$userName, ".rds")
     saveRDS(scenario_temp, filename)
-    drop_upload(filename, path = "responses")
+    #write.csv(Epic, "data/scenario.csv") - used to create the data structrue in the sqlite db
+    #drop_upload(filename, path = "responses")
+    
+    
+    #USER <- reactiveValues(acct_id = 1)
+    print(user_acct_id)
+    #scenario_temp <- "John.rds"
+    
+    conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
+    combined <- cbind(acct_id = user_acct_id, scenario_temp)
+    print(combined)
+    dbSendQuery(conn, "INSERT INTO scenarios (acct_id) VALUES 1")
+    dbDisconnect(conn)
+    
+    
     shinyalert(title = "Saved!", type = "success")
+    
   })
   #Load scenario ----
   observeEvent(input$load_scenario, {
