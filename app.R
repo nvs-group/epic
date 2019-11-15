@@ -52,7 +52,7 @@ loadData <- function (table) {
   query <- sprintf("SELECT * FROM %s", table)
   # submit the fect query and disconnect
   data <- dbGetQuery(conn, query)
-  #dbDisconnect(conn)
+  dbDisconnect(conn)
   data
 }
 
@@ -364,7 +364,7 @@ server <- function(input, output, session) {
       conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
       # query db for username
       result <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = Username)
-      #dbDisconnect(conn)
+      dbDisconnect(conn)
       if(nrow(result) < 1) {
         shinyalert(title = "Username or Password incorrect", type = "error")
       } else {
@@ -668,10 +668,8 @@ server <- function(input, output, session) {
     
     ## check if username already exists
     conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
-    
-    #print(new_row$user_name)
-    
     username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = new_row$user_name)
+    dbDisconnect(conn)
     #print(username_exist)
     if(nrow(username_exist) > 0) {
       
