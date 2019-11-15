@@ -115,3 +115,6 @@ I can
 * create a new user using the "create Account" box
 + check if username already exsts, if yes, then error message, if not, then add to database
 * log in with the new user
+* found out
+** Need to close the database in dbbrowser
+** Need to dbdisconnect after every connect
