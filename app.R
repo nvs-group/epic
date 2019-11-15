@@ -44,15 +44,15 @@ selectedrowindex = 0
 # load data from database -----
 # path to sqlite db
 sqlitePath <- "data/epic.sqlite"
-# connect to db
-conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
 
 loadData <- function (table) {
+  # connect to db
+  conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
   # construct the fecting query
   query <- sprintf("SELECT * FROM %s", table)
   # submit the fect query and disconnect
   data <- dbGetQuery(conn, query)
-  #dbDisconnect(conn)
+  dbDisconnect(conn)
   data
 }
 
@@ -360,8 +360,11 @@ server <- function(input, output, session) {
       Username <- isolate(input$userName)
       Password <- isolate(input$passwd)
       
+      # connect to db
+      conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
       # query db for username
       result <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = Username)
+      dbDisconnect(conn)
       if(nrow(result) < 1) {
         shinyalert(title = "Username or Password incorrect", type = "error")
       } else {
@@ -670,8 +673,14 @@ server <- function(input, output, session) {
     #   removeModal()
     #   shinyalert(title = "Username already used", type = "error")
     # } else {
+      # connect to db
+      conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
+
       ## load new user to accounts db ----
       dbWriteTable(conn,"accounts", new_row, append = TRUE)
+      # disconnect DB
+      dbDisconnect(conn)
+      
       # removeModal()
       # shinyalert(title = "Account created")
     #}
