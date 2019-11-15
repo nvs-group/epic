@@ -118,3 +118,14 @@ I can
 * found out
 ** Need to close the database in dbbrowser
 ** Need to dbdisconnect after every connect
+
+OK, let me try to capture what I was able to do:
+1. migrated the datapersistance_dev branch directly to nvsgroup.org server
+* possible by cloning the epic repository into the folder "datapersistance_dev" inside the /srv/shiny-server/ folder (also created a new project in rstudio.nvsgroup.org by cloning the epic repository into a new folder with /R/datapersistance_dev)
+* now I can continue to use the rstudio.nvsgroup.org server/website to develop and test (instead of a separate server), and I can actually run the app in a separate folder on the same server (back down to 1 server instead of 2)
+2. Also, I was able to implement the check if a username exists code, and
+3. sql authentication works (as far as I know)
+
+Useful commands:
+git clone git@github.com:nvs-group/epic.git datapersistance_dev [in the root of /svr/shiny-server/]
+Also needed to copy the db to the data folder of the app manually
