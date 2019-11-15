@@ -669,7 +669,7 @@ server <- function(input, output, session) {
     ## check if username already exists
     conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
     username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = new_row$user_name)
-    dbDisconnect(conn)
+    
     #print(username_exist)
     if(nrow(username_exist) > 0) {
       
@@ -682,7 +682,7 @@ server <- function(input, output, session) {
       ## load new user to accounts db ----
       dbWriteTable(conn,"accounts", new_row, append = TRUE)
       # disconnect DB
-      #dbDisconnect(conn)
+      dbDisconnect(conn)
       
       # removeModal()
       # shinyalert(title = "Account created")
