@@ -129,3 +129,4 @@ OK, let me try to capture what I was able to do:
 Useful commands:
 git clone git@github.com:nvs-group/epic.git datapersistance_dev [in the root of /svr/shiny-server/]
 Also needed to copy the db to the data folder of the app manually
+
