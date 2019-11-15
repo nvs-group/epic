@@ -674,7 +674,7 @@ server <- function(input, output, session) {
       dbWriteTable(conn,"accounts", new_row, append = TRUE)
       # removeModal()
       # shinyalert(title = "Account created")
-    }
+    #}
     
 
     removeModal()
