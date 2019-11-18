@@ -520,8 +520,13 @@ server <- function(input, output, session) {
   #Delete Button  
   observeEvent(input$delete_scenario, {
     if(length(input$epic.scenarios.table_rows_selected)>= 1){
-      scenario_temp <<- scenario_temp[-input$epic.scenarios.table_rows_selected,]
+      scenario_temp <<- scenario_temp[-input$epic.scenarios.table_rows_selected,] #problem with this code is that delete works by rows, not by id
       row.names(scenario_temp) <<- 1:nrow(scenario_temp)
+      conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
+      combined <- cbind(acct_id = user_acct_id, scenario_temp)
+      #print(combined)
+      #dbWriteTable(conn, "scenarios", combined, append = TRUE) # this line is duplicating scenario_temp into sqlite
+      dbDisconnect(conn)
     }
   })
   #Filter for First Table
@@ -623,8 +628,8 @@ server <- function(input, output, session) {
   })
   # Save scenario ----
   observeEvent(input$save_scenario,{
-    filename <- paste0(input$userName, ".rds")
-    saveRDS(scenario_temp, filename)
+    #filename <- paste0(input$userName, ".rds")
+    #saveRDS(scenario_temp, filename)
     #write.csv(Epic, "data/scenario.csv") - used to create the data structrue in the sqlite db
     #drop_upload(filename, path = "responses")
     
@@ -634,9 +639,10 @@ server <- function(input, output, session) {
     #scenario_temp <- "John.rds"
     
     conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
+    ##! Saving replicates data in SQLite, but is not displayed until you hit load
     combined <- cbind(acct_id = user_acct_id, scenario_temp)
-    print(combined)
-    dbSendQuery(conn, "INSERT INTO scenarios (acct_id) VALUES 1")
+    #print(combined)
+    dbWriteTable(conn, "scenarios", combined, append=TRUE)
     dbDisconnect(conn)
     
     
@@ -645,16 +651,24 @@ server <- function(input, output, session) {
   })
   #Load scenario ----
   observeEvent(input$load_scenario, {
-    filename2 <- paste0("responses/",input$userName, ".rds")
-    if(drop_exists(filename2) == FALSE) {
-      shinyalert(title = "File Not Found", type = "error")
-    } else {
-      #      filename2 <- paste0("responses", filename)
-      drop_download(filename2, overwrite = TRUE)
-      filename <- paste0(input$userName, ".rds")
-      scenario_temp <<- readRDS(filename)
-      shinyalert(title = "Loaded", type = "success")
-    } 
+    # filename2 <- paste0("responses/",input$userName, ".rds")
+    # if(drop_exists(filename2) == FALSE) {
+    #   shinyalert(title = "File Not Found", type = "error")
+    # } else {
+    #   #      filename2 <- paste0("responses", filename)
+    #   drop_download(filename2, overwrite = TRUE)
+    #   filename <- paste0(input$userName, ".rds")
+    #   scenario_temp <<- readRDS(filename)
+    #   shinyalert(title = "Loaded", type = "success")
+    # } 
+    
+    conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
+    scenarios_query <- dbGetQuery(conn, "SELECT * FROM scenarios WHERE acct_id = ?", params = user_acct_id)
+    dbDisconnect(conn)
+    scenario_temp <<- scenarios_query
+    
+    shinyalert(title = "Loaded", type = "success")
+    
   })
   observeEvent(input$add_user, {
     ### This is the pop up board for input a new row
