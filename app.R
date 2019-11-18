@@ -59,10 +59,15 @@ pc_index2 <- 0
 pc_index3 <- 0
 roi_table <- data.frame(total_cost = numeric(), total_wages = numeric())
 cummulative_table <- data.frame(total_1 = numeric())
+cummulative_graph <- data.frame(years = numeric(), dfnomatch=NULL)
 raw_table <- data.frame(option_1 = numeric())
 running_total <- 0
 career_years <- 0
-
+graph_parameters <- NULL
+cg_years <- data.frame(years = numeric())
+cg_card1 <- data.frame(card1 = numeric())
+cg_card2 <- data.frame(card2 = numeric())
+cg_card3 <- data.frame(card3 = numeric())
 
 #place_card <- function(index){
 #  pcresult <- box(width = 4,
@@ -97,31 +102,36 @@ place_card <- function(index){
                   scenario_temp$occ.name[index], br(),
                   strong("Salary :"), 
                   scenario_temp$X17p[index])
-                  
   return(pcresult)
 }
 init_variables <- function(){
-  cummulative_table <<- data.frame(total_1 = numeric())
-  raw_table <<- data.frame(option_1 = numeric())
+  cummulative_table <<- cummulative_table[FALSE,]
+#  cummulative_graph <<- data.frame(col = numeric(), nomatch=NULL )
+  raw_table <<- raw_table[FALSE,]
+  cg_years <<- cg_years[FALSE]
+  cg_card1 <<- data.frame(card1 = numeric())
+  cg_card2 <<- data.frame(card2 = numeric())
+  cg_card3 <<- data.frame(card3 = numeric())
+#  cummulative_graph <- data.frame(years = numeric(), dfnomatch=NULL)
 }
-school_cost <- function(index){
-  year_change <- 0
-  running_total <<- 0
+school_years <- function(index) {
   dc <- scenario_temp$degree.code[index]
   nyear <- as.numeric(filter(num.years, deg.code %in% dc) %>% select(years))
-  print(nyear)
+  return(nyear)
+}
+school_cost <- function(index, nyear){
+  year_change <- 0
+  running_total <<- 0
   annual_cost <- scenario_temp$InStOff[index]
   for(i in (1:nyear)){
     year_change <- round(annual_cost, 0)
-    raw_table <<- rbind(raw_table, year_change)
+    raw_table <<- rbind(raw_table, -(year_change))
     running_total <<- round((running_total - annual_cost),0)
     cummulative_table <<- rbind(cummulative_table, running_total)
   }
   return()
 }
-career_income <- function(index){
-  year_change <- scenario_temp$X17p[index]
-  occf <- scenario_temp$MedOccF[index]
+career_income <- function(index, year_change, occf){
   raw_table <<- rbind(raw_table, year_change)
   running_total <<- running_total + year_change
   cummulative_table <<- rbind(cummulative_table, running_total)
@@ -133,7 +143,52 @@ career_income <- function(index){
     cummulative_table <<- rbind(cummulative_table, running_total)
   }
   return()
+}
+create_years <- function(num_years2) {
   
+  for(i in(1:num_years2)){
+    cg_years <<- rbind(cg_years, as.numeric(i))
+  }
+  cummulative_graph <<- cg_years
+  colnames(cummulative_graph) <<- c("years")
+#  print(cummulative_graph$years)
+  graph_parameters <<- ggplot() + 
+    xlab('Years') +
+    ylab('Total Earnings') +
+    labs(title = 'Cummulative Cash Flow') +
+    scale_colour_manual(name="Occupation", values = c("First" = "blue", "Second" = "green", "Third" = "red")) +
+    theme(plot.title = element_text(hjust = 0.5))
+  return()
+}
+
+create_data <- function(index, num_years2) {
+  init_variables()
+  nyears <- school_years(index)
+  school_cost(index, nyears)
+  year_change <- scenario_temp$X17p[index]
+  occf <- scenario_temp$MedOccF[index]
+  career_years <<- as.numeric(num_years2 - nyears - 1)
+  career_income(index, year_change, occf)
+  add_column(index)
+  return()
+}
+add_column <- function(index) {
+  if(index == pc_index1) {
+    cg_card1 <<- cummulative_table
+    cummulative_graph <<- cbind(cummulative_graph, "card1" = cg_card1)
+    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card1, colour = "First"), show.legend = TRUE)
+  }
+  if(index == pc_index2) {
+    cg_card2 <<- cummulative_table
+    cummulative_graph <<- cbind(cummulative_graph, "card2" = cg_card2)
+    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card2, colour = "Second"), show.legend = TRUE)
+  }
+  if(index == pc_index3) {
+    cg_card3 <<- cummulative_table
+    cummulative_graph <<- cbind(cummulative_graph, "card3" = cg_card3)
+    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card3, colour = "Third"), show.legend = TRUE)
+  }
+  return()
 }
 
 header <- dashboardHeader( title = "E.P.I.C. Planning", titleWidth = 230, uiOutput("logoutbtn"))
@@ -318,7 +373,11 @@ body <- dashboardBody(
               uiOutput(outputId = "row.choice.table2"),
               uiOutput(outputId = "row.choice.table3")
             ),
-            hr()
+            hr(),
+            fluidRow(
+              box(width = 6,
+                  plotOutput("cummulative.plot")
+              ))
     ),
     tabItem(tabName = "login",
             div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
@@ -555,7 +614,6 @@ server <- function(input, output, session) {
     if(!is.null(pc_index1)) {
       output$row.choice.table1 <- renderUI({
         place_card(pc_index1)
-
       })
     }
   })
@@ -583,18 +641,30 @@ server <- function(input, output, session) {
     pc_index1 <<- 0
     pc_index2 <<- 0
     pc_index3 <<- 0
+    output$cummulative.plot <- renderPlot({
+      NULL
+    })
   })
   observeEvent(input$create_data,{
+    cummulative_graph <<- cummulative_graph[FALSE,]
+    num_years2 <- as.numeric(input$num_years)
+    create_years(num_years2)
     if(pc_index1 > 0) {
-      init_variables()
-      school_cost(pc_index1)
-      dc <- scenario_temp$degree.code[pc_index1]
-      nyear <- filter(num.years, deg.code %in% dc) %>% select(years)
-      career_years <<- as.numeric(input$num_years - nyear - 1)
-      career_income(pc_index1)
-      print(cummulative_table)
-      print(raw_table)
+      index <- pc_index1
+      create_data(index, num_years2)
     }
+    if(pc_index2 > 0) {
+      index <- pc_index2
+      create_data(index, num_years2)
+    }
+    if(pc_index3 > 0) {
+      index <- pc_index3
+      create_data(index, num_years2)
+    }   
+
+    output$cummulative.plot <- renderPlot({
+      graph_parameters
+    })
   })
   #Save scenario
   observeEvent(input$save_scenario,{
