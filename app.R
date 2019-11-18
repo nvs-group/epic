@@ -154,9 +154,10 @@ create_years <- function(num_years2) {
   colnames(cummulative_graph) <<- c("years")
   graph_parameters <<- ggplot() + 
     xlab('Years') +
-    ylab('Total Earnings') +
+    ylab('Total Earnings in Thousands') +
     labs(title = 'Cummulative Cash Flow') +
-    scale_colour_manual(name="Occupation", values = c("First" = "blue", "Second" = "green", "Third" = "red")) +
+    scale_colour_manual(name="Occupation", values = c("First" = "blue", "Second" = "green", "Third" = "red"),
+                        labels = c(scenario_temp$occ.name[pc_index1],scenario_temp$occ.name[pc_index2],scenario_temp$occ.name[pc_index3])) +
     theme(plot.title = element_text(hjust = 0.5))
   return()
 }
@@ -176,17 +177,17 @@ add_column <- function(index) {
   if(index == pc_index1) {
     cg_card1 <<- cummulative_table
     cummulative_graph <<- cbind(cummulative_graph, "card1" = cg_card1)
-    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card1, colour = "First"), show.legend = TRUE)
+    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card1/1000, colour = "First"), show.legend = TRUE) 
   }
   if(index == pc_index2) {
     cg_card2 <<- cummulative_table
     cummulative_graph <<- cbind(cummulative_graph, "card2" = cg_card2)
-    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card2, colour = "Second"), show.legend = TRUE)
+    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card2/1000, colour = "Second"), show.legend = TRUE)
   }
   if(index == pc_index3) {
     cg_card3 <<- cummulative_table
     cummulative_graph <<- cbind(cummulative_graph, "card3" = cg_card3)
-    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card3, colour = "Third"), show.legend = TRUE)
+    graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card3/1000, colour = "Third"), show.legend = TRUE)
   }
   return()
 }
