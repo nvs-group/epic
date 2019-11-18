@@ -377,7 +377,10 @@ body <- dashboardBody(
             fluidRow(
               box(width = 6,
                   plotOutput("cummulative.plot")
-              ))
+              ),
+              box(width = 6,
+                  div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "temp.table"))
+                  ))
     ),
     tabItem(tabName = "login",
             div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
@@ -664,6 +667,12 @@ server <- function(input, output, session) {
 
     output$cummulative.plot <- renderPlot({
       graph_parameters
+    })
+    output$temp.table <- renderDataTable({
+      ({
+        DT::datatable(data = cummulative_graph , rownames = TRUE,
+                      options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "single"))
+      })
     })
   })
   #Save scenario
