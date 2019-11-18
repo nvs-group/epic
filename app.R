@@ -136,7 +136,7 @@ career_income <- function(index, year_change, occf){
   running_total <<- running_total + year_change
   cummulative_table <<- rbind(cummulative_table, running_total)
   for(i in (1:career_years)){
-    tf <- (1 + ((0.0002 * ((i) ^ 2)) - 0.0023 * (i) + 0.0603))
+    tf <- (1 + ((0.00002 * ((i) ^ 2)) - 0.0023 * (i) + 0.0603))
     year_change <- year_change * tf * occf
     raw_table <<- rbind(raw_table, year_change)
     running_total <<- running_total + year_change
