@@ -273,6 +273,7 @@ body <- dashboardBody(
               )
             )
     ),
+    ### compare tab ----
     tabItem(tabName = "compare",
             fluidRow(
               box(width = 2,
@@ -284,7 +285,7 @@ body <- dashboardBody(
             ),
             fluidRow(
               box(width = 12,
-                  div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "epic.scenarios.table"))
+                  div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "epic.scenarios.table"),)
               )
               
             ),
@@ -683,12 +684,12 @@ server <- function(input, output, session) {
   })
   ### Add a new row to DT  
   observeEvent(input$go, {
-    new_row=data.frame(
-      acct_first_last = input[[paste0("Names_add", input$Add_row_head)]],
+    new_user=data.frame(
       user_name = input[[paste0("Username_add", input$Add_row_head)]],
       user_password = sapply(input[[paste0("Password_add", input$Add_row_head)]],password_store),
-      acct_email = input[[paste0("Email_add", input$Add_row_head)]],
       acct_admin = "No",
+      acct_first_last = input[[paste0("Names_add", input$Add_row_head)]],
+      acct_email = input[[paste0("Email_add", input$Add_row_head)]],
       acct_created = as.character(Sys.time()),
       stringsAsFactors = FALSE
     )
@@ -698,21 +699,22 @@ server <- function(input, output, session) {
     
     ## check if username already exists
     conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
-    username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = new_row$user_name)
+    username_exist <- dbGetQuery(conn, "SELECT * FROM accounts WHERE user_name = ?", params = new_user$user_name)
     dbDisconnect(conn)
     
-    #print(username_exist)
+    print(username_exist)
+    
     if(nrow(username_exist) > 0) {
       
       print(username_exist$user_name)
       #   removeModal()
-      shinyalert(title = "Username already used", type = "error")
+      shinyalert(title = "Username already exists", type = "error")
     } else {
       # connect to db
       
       ## load new user to accounts db ----
       conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
-      dbWriteTable(conn,"accounts", new_row, append = TRUE)
+      dbWriteTable(conn,"accounts", new_user, append = TRUE)
       # disconnect DB
       dbDisconnect(conn)
       
