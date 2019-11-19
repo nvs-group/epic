@@ -69,22 +69,7 @@ cg_card1 <- data.frame(card1 = numeric())
 cg_card2 <- data.frame(card2 = numeric())
 cg_card3 <- data.frame(card3 = numeric())
 
-#place_card <- function(index){
-#  pcresult <- box(width = 4,
-#                  strong("Occupation :"), 
-#                  scenario_temp$occ.name[index], br(),
-#                  strong("School :"), 
-#                  scenario_temp$school.name[index], br(),
-#                  strong("Curriculum :"), 
-#                  scenario_temp$cip.name[index], br(),
-#                  strong("Degree :"), 
-#                  scenario_temp$degree.name[index], br(),
-#                  strong("Salary :"), 
-#                  scenario_temp$X17p[index], br(),
-#                  strong("Tot Annual Cost :"), 
-#                  scenario_temp$InStOff[index])
-#  return(pcresult)
-#}
+
 place_card <- function(index){
   dc <- scenario_temp$degree.code[index]
   nyear <- filter(num.years, deg.code %in% dc) %>% select(years)
@@ -122,6 +107,7 @@ school_years <- function(index) {
 school_cost <- function(index, nyear){
   year_change <- 0
   running_total <<- 0
+  cummulative_table <<- rbind(cummulative_table, running_total)
   annual_cost <- scenario_temp$InStOff[index]
   for(i in (1:nyear)){
     year_change <- round(annual_cost, 0)
@@ -147,17 +133,21 @@ career_income <- function(index, year_change, occf){
 }
 create_years <- function(num_years2) {
   
-  for(i in(1:num_years2)){
+  for(i in(0:num_years2)){
     cg_years <<- rbind(cg_years, as.numeric(i))
   }
   cummulative_graph <<- cg_years
   colnames(cummulative_graph) <<- c("years")
+  graph_label1 <- paste0(scenario_temp$occ.name[pc_index1],"\n",scenario_temp$school.name[pc_index1],"\n")
+  graph_label2 <- paste0(scenario_temp$occ.name[pc_index2],"\n",scenario_temp$school.name[pc_index2],"\n")
+  graph_label3 <- paste0(scenario_temp$occ.name[pc_index3],"\n",scenario_temp$school.name[pc_index3],"\n")
+  graph_list <-c(graph_label1, graph_label2, graph_label3)
   graph_parameters <<- ggplot() + 
     xlab('Years') +
     ylab('Total Earnings in Thousands') +
     labs(title = 'Cummulative Cash Flow') +
     scale_colour_manual(name="Occupation", values = c("First" = "blue", "Second" = "green", "Third" = "red"),
-                        labels = c(scenario_temp$occ.name[pc_index1],scenario_temp$occ.name[pc_index2],scenario_temp$occ.name[pc_index3])) +
+                        labels = graph_list) +
     theme(plot.title = element_text(hjust = 0.5))
   return()
 }
@@ -356,7 +346,7 @@ body <- dashboardBody(
                   actionButton(inputId = "clear_all", label = "Clear all Scenarios", width = '100%')),
               
               box(width = 2,
-                  numericInput(inputId = "num_years", label = "Number of years to chart", value = 25, min = 1, max = 52 )),
+                  numericInput(inputId = "num_years", label = "Number of years to chart", value = 25, min = 15, max = 52 )),
               box(width = 2,
                   strong("Press to create Graph"),br(),
                   actionButton(inputId = "create_data", label = "Go", width = '100%'))
@@ -376,10 +366,10 @@ body <- dashboardBody(
             ),
             hr(),
             fluidRow(
-              box(width = 6,
+              box(width = 8,
                   plotOutput("cummulative.plot")
               ),
-              box(width = 6,
+              box(width = 4,
                   div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "temp.table"))
                   ))
     ),
@@ -671,7 +661,7 @@ server <- function(input, output, session) {
     })
     output$temp.table <- renderDataTable({
       ({
-        DT::datatable(data = cummulative_graph , rownames = TRUE,
+        DT::datatable(data = cummulative_graph , rownames = FALSE,
                       options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "single"))
       })
     })
