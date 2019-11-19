@@ -142,12 +142,14 @@ create_years <- function(num_years2) {
   graph_label2 <- paste0(scenario_temp$occ.name[pc_index2],"\n",scenario_temp$school.name[pc_index2],"\n")
   graph_label3 <- paste0(scenario_temp$occ.name[pc_index3],"\n",scenario_temp$school.name[pc_index3],"\n")
   graph_list <-c(graph_label1, graph_label2, graph_label3)
+  graph_scale <- round(num_years2/10, 0)
   graph_parameters <<- ggplot() + 
     xlab('Years') +
     ylab('Total Earnings in Thousands') +
     labs(title = 'Cummulative Cash Flow') +
     scale_colour_manual(name="Occupation", values = c("First" = "blue", "Second" = "green", "Third" = "red"),
                         labels = graph_list) +
+    scale_x_continuous(breaks = seq(0,num_years2,graph_scale)) +
     theme(plot.title = element_text(hjust = 0.5))
   return()
 }
@@ -366,7 +368,7 @@ body <- dashboardBody(
             ),
             hr(),
             fluidRow(
-              box(width = 8,
+              box(width = 8, height = 600,
                   plotOutput("cummulative.plot")
               ),
               box(width = 4,
@@ -656,7 +658,7 @@ server <- function(input, output, session) {
       create_data(index, num_years2)
     }   
 
-    output$cummulative.plot <- renderPlot({
+    output$cummulative.plot <- renderPlot(height = 600,{
       graph_parameters
     })
     output$temp.table <- renderDataTable({
