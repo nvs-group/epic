@@ -715,7 +715,8 @@ server <- function(input, output, session) {
       
       ## load new user to accounts db ----
       conn <- dbConnect(RSQLite::SQLite(), sqlitePath)
-      print(new_user)
+
+      #print(new_user)
       str(new_user)
       dbWriteTable(conn,"accounts", new_user, append = TRUE)
       # disconnect DB
