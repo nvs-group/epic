@@ -719,7 +719,7 @@ server <- function(input, output, session) {
 
       #print(new_user)
       str(new_user)
-      dbWriteTable(conn, accounts, new_user, append = TRUE)
+      dbWriteTable(conn,"accounts", new_user, append = TRUE)
       # disconnect DB
       dbDisconnect(conn)
       
