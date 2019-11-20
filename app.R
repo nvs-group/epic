@@ -20,7 +20,7 @@ library(rdrop2)
 library(assertive)
 
 #token <- drop_auth()
-#saveRDS(token, "droptoken.rds")
+#saveRDS(token, "droptoken.rds", compress = FALSE)
 token <- readRDS("droptoken.rds")
 drop_auth(rdstoken = "droptoken.rds")
 # Then pass the token to each drop_ function
@@ -43,7 +43,7 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #  passod   = sapply("pass1",password_store),
 #  permission  = c("advanced"), 
 #  stringsAsFactors = F)
-#saveRDS(credentials, "cred.rds")
+#saveRDS(credentials, "cred.rds" ,compress = FALSE)
 #drop_upload("cred.rds", path = "responses")
 drop_download("responses/cred.rds", overwrite = TRUE)
 credentials <- readRDS("cred.rds")
@@ -671,7 +671,7 @@ server <- function(input, output, session) {
   #Save scenario
   observeEvent(input$save_scenario,{
     filename <- paste0(input$userName, ".rds")
-    saveRDS(scenario_temp, filename)
+    saveRDS(scenario_temp, filename,  compress = FALSE)
     drop_upload(filename, path = "responses")
     shinyalert(title = "Saved!", type = "success")
   })
@@ -705,7 +705,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
     credentials <<- rbind(credentials, new_row)
-    saveRDS(credentials, "cred.rds")
+    saveRDS(credentials, "cred.rds", compress = FALSE)
     drop_upload("cred.rds", path = "responses")
     removeModal()
   })
