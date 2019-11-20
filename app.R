@@ -109,8 +109,8 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 # )
 # saveRDS(credentials, "cred.rds")
 # drop_upload("cred.rds", path = "responses")
-#drop_download("responses/cred.rds", overwrite = TRUE)
-#credentials <- readRDS("cred.rds")
+drop_download(file.path("responses","cred.rds"), overwrite = TRUE)
+credentials <- readRDS("cred.rds")
 
 place_card <- function(index){
   pcresult <- box(width = 4,
