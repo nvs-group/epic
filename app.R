@@ -44,7 +44,7 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #  passod   = sapply("pass1",password_store),
 #  permission  = c("advanced"), 
 #  stringsAsFactors = F)
-#saveRDS(credentials, "cred.rds" ,compress = FALSE)
+#saveRDS(credentials, "cred.rds")
 #drop_upload("cred.rds", path = "responses")
 drop_download("responses/cred.rds", overwrite = TRUE)
 credentials <- readRDS("cred.rds")
@@ -60,7 +60,7 @@ pc_index2 <- 0
 pc_index3 <- 0
 roi_table <- data.frame(total_cost = numeric(), total_wages = numeric())
 cummulative_table <- data.frame(total_1 = numeric())
-cummulative_graph <- data.frame(years = numeric(), dfnomatch=NULL)
+cummulative_graph <- data.frame(years = numeric())
 raw_table <- data.frame(option_1 = numeric())
 running_total <- 0
 career_years <- 0
@@ -69,7 +69,6 @@ cg_years <- data.frame(years = numeric())
 cg_card1 <- data.frame(card1 = numeric())
 cg_card2 <- data.frame(card2 = numeric())
 cg_card3 <- data.frame(card3 = numeric())
-
 
 place_card <- function(index){
   dc <- scenario_temp$degree.code[index]
@@ -91,14 +90,13 @@ place_card <- function(index){
   return(pcresult)
 }
 init_variables <- function(){
-  cummulative_table <<- cummulative_table[FALSE,]
-#  cummulative_graph <<- data.frame(col = numeric(), nomatch=NULL )
-  raw_table <<- raw_table[FALSE,]
+  cummulative_table <<- cummulative_table[FALSE]
+  #  cummulative_graph <<- data.frame(col = numeric(), nomatch=NULL )
+  raw_table <<- raw_table[FALSE]
   cg_years <<- cg_years[FALSE]
   cg_card1 <<- data.frame(card1 = numeric())
   cg_card2 <<- data.frame(card2 = numeric())
   cg_card3 <<- data.frame(card3 = numeric())
-#  cummulative_graph <- data.frame(years = numeric(), dfnomatch=NULL)
 }
 school_years <- function(index) {
   dc <- scenario_temp$degree.code[index]
@@ -109,6 +107,7 @@ school_cost <- function(index, nyear){
   year_change <- 0
   running_total <<- 0
   cummulative_table <<- rbind(cummulative_table, running_total)
+  if(nyear == 0) {return()}
   annual_cost <- scenario_temp$InStOff[index]
   for(i in (1:nyear)){
     year_change <- round(annual_cost, 0)
@@ -133,10 +132,11 @@ career_income <- function(index, year_change, occf){
   return()
 }
 create_years <- function(num_years2) {
-  
+  init_variables()
   for(i in(0:num_years2)){
     cg_years <<- rbind(cg_years, as.numeric(i))
   }
+  
   cummulative_graph <<- cg_years
   colnames(cummulative_graph) <<- c("years")
   graph_label1 <- paste0(scenario_temp$occ.name[pc_index1],"\n",scenario_temp$school.name[pc_index1],"\n")
@@ -169,17 +169,20 @@ create_data <- function(index, num_years2) {
 add_column <- function(index) {
   if(index == pc_index1) {
     cg_card1 <<- cummulative_table
-    cummulative_graph <<- cbind(cummulative_graph, "card1" = cg_card1)
+    cummulative_graph <<- cbind(cummulative_graph, cg_card1)
+    names(cummulative_graph)[2] <<- "card1"
     graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card1/1000, colour = "First"), show.legend = TRUE) 
   }
   if(index == pc_index2) {
-    cg_card2 <<- cummulative_table
-    cummulative_graph <<- cbind(cummulative_graph, "card2" = cg_card2)
+    cg_card2 <- cummulative_table
+    cummulative_graph <<- cbind(cummulative_graph, cg_card2)
+    names(cummulative_graph)[3] <<- "card2"
     graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card2/1000, colour = "Second"), show.legend = TRUE)
   }
   if(index == pc_index3) {
-    cg_card3 <<- cummulative_table
-    cummulative_graph <<- cbind(cummulative_graph, "card3" = cg_card3)
+    cg_card3 <- cummulative_table
+    cummulative_graph <<- cbind(cummulative_graph, cg_card3)
+    names(cummulative_graph)[4] <<- "card3"
     graph_parameters <<- graph_parameters + geom_line(data = cummulative_graph, aes(x = years, y = card3/1000, colour = "Third"), show.legend = TRUE)
   }
   return()
@@ -194,7 +197,8 @@ body <- dashboardBody(
             h2("Hello and Welcome to your EPIC experience"),
             h2("Test drive the world's first fully integrated"),
             h2("Education-Profession Investment Calculator"),
-            useShinyalert()
+            useShinyalert(),
+            useShinyjs()
     ),
     tabItem(tabName = "about",
             h2("Hello and Welcome to your EPIC experience"),
@@ -332,11 +336,11 @@ body <- dashboardBody(
     tabItem(tabName = "compare",
             fluidRow(
               box(width = 2,
-                  actionButton(inputId = "delete_scenario", label = "Delete", width = '100%')),
+                  actionButton(inputId = "delete_scenario", label = "Delete Row", width = '100%')),
               box(width = 2,
-                  actionButton(inputId = "load_scenario", label = "Load", width = '100%')),
+                  actionButton(inputId = "load_scenario", label = "Load Scenario", width = '100%')),
               box(width = 2,
-                  actionButton(inputId = "save_scenario", label = "Save", width = '100%'))
+                  actionButton(inputId = "save_scenario", label = "Save Scenario", width = '100%'))
             ),
             fluidRow(
               box(width = 12,
@@ -371,10 +375,8 @@ body <- dashboardBody(
             fluidRow(
               box(width = 8, height = 600,
                   plotOutput("cummulative.plot")
-              ),
-              box(width = 4,
-                  div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "temp.table"))
-                  ))
+              )
+             )
     ),
     tabItem(tabName = "login",
             div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
@@ -538,6 +540,7 @@ server <- function(input, output, session) {
       if(nrow(scenario_temp)>= 1){
         row.names(scenario_temp) <<- 1:nrow(scenario_temp)}
     }
+    click("clear_all")
   })
   #Filter for First Table
   table_var <- reactive({
@@ -609,25 +612,41 @@ server <- function(input, output, session) {
   observeEvent(input$add_one_compare, {
     pc_index1 <<- input$epic.scenarios.table_rows_selected
     if(!is.null(pc_index1)) {
+      if(pc_index1 == pc_index2 | pc_index1 == pc_index3) {
+        pc_index1 <<- 0
+      } else {
       output$row.choice.table1 <- renderUI({
         place_card(pc_index1)
       })
+      }
     }
   })
   observeEvent(input$add_two_compare, {
+    if(pc_index1 > 0){
     pc_index2 <<- input$epic.scenarios.table_rows_selected
     if(!is.null(pc_index2)) {
+      if(pc_index2 == pc_index1 | pc_index2 == pc_index3) {
+        pc_index2 <<- 0
+      } else {
       output$row.choice.table2 <- renderUI({
         place_card(pc_index2)
       })
+      }
     }
+  }
   })
   observeEvent(input$add_three_compare, {
+    if(pc_index1 > 0 && pc_index2 > 0){
     pc_index3 <<- input$epic.scenarios.table_rows_selected
     if(!is.null(pc_index3)) {
+      if(pc_index3 == pc_index1 | pc_index3 == pc_index2) {
+        pc_index3 <<- 0
+      } else {
       output$row.choice.table3 <- renderUI({
         place_card(pc_index3)
       })
+      }
+    }
     }
   })
   #Clear All choice boxes
@@ -638,9 +657,7 @@ server <- function(input, output, session) {
     pc_index1 <<- 0
     pc_index2 <<- 0
     pc_index3 <<- 0
-    output$cummulative.plot <- renderPlot({
-      NULL
-    })
+    output$cummulative.plot <- renderPlot({NULL})
   })
   observeEvent(input$create_data,{
     cummulative_graph <<- cummulative_graph[FALSE,]
@@ -662,17 +679,11 @@ server <- function(input, output, session) {
     output$cummulative.plot <- renderPlot(height = 600,{
       graph_parameters
     })
-    output$temp.table <- renderDataTable({
-      ({
-        DT::datatable(data = cummulative_graph , rownames = FALSE,
-                      options = list(pageLength = input$RecordsNum, filter = FALSE),selection = list(mode = "single"))
-      })
-    })
   })
   #Save scenario
   observeEvent(input$save_scenario,{
     filename <- paste0(input$userName, ".rds")
-    saveRDS(scenario_temp, filename,  compress = FALSE)
+    saveRDS(scenario_temp, filename)
     drop_upload(filename, path = "responses")
     shinyalert(title = "Saved!", type = "success")
   })
@@ -706,7 +717,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
     credentials <<- rbind(credentials, new_row)
-    saveRDS(credentials, "cred.rds", compress = FALSE)
+    saveRDS(credentials, "cred.rds")
     drop_upload("cred.rds", path = "responses")
     removeModal()
   })
