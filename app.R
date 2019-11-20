@@ -610,43 +610,43 @@ server <- function(input, output, session) {
   #Table prep with filters and Column choices for second table
 
   observeEvent(input$add_one_compare, {
-    pc_index1 <<- input$epic.scenarios.table_rows_selected
-    if(!is.null(pc_index1)) {
+    if(!is.null(input$epic.scenarios.table_rows_selected)) {
+      pc_index1 <<- input$epic.scenarios.table_rows_selected
       if(pc_index1 == pc_index2 | pc_index1 == pc_index3) {
         pc_index1 <<- 0
-      } else {
-      output$row.choice.table1 <- renderUI({
-        place_card(pc_index1)
-      })
-      }
+        } else {
+          output$row.choice.table1 <- renderUI({
+            place_card(pc_index1)
+            })
+        }
     }
   })
   observeEvent(input$add_two_compare, {
-    if(pc_index1 > 0){
-    pc_index2 <<- input$epic.scenarios.table_rows_selected
-    if(!is.null(pc_index2)) {
-      if(pc_index2 == pc_index1 | pc_index2 == pc_index3) {
-        pc_index2 <<- 0
-      } else {
-      output$row.choice.table2 <- renderUI({
-        place_card(pc_index2)
-      })
+    if(!is.null(input$epic.scenarios.table_rows_selected)) {
+      if(pc_index1 > 0){
+        pc_index2 <<- input$epic.scenarios.table_rows_selected
+        if(pc_index2 == pc_index1 | pc_index2 == pc_index3) {
+          pc_index2 <<- 0
+          } else {
+            output$row.choice.table2 <- renderUI({
+              place_card(pc_index2)
+              })
+          }
       }
     }
-  }
   })
   observeEvent(input$add_three_compare, {
-    if(pc_index1 > 0 && pc_index2 > 0){
-    pc_index3 <<- input$epic.scenarios.table_rows_selected
-    if(!is.null(pc_index3)) {
-      if(pc_index3 == pc_index1 | pc_index3 == pc_index2) {
-        pc_index3 <<- 0
-      } else {
-      output$row.choice.table3 <- renderUI({
-        place_card(pc_index3)
-      })
+    if(!is.null(input$epic.scenarios.table_rows_selected)) {
+      if(pc_index1 > 0 && pc_index2 > 0){
+        pc_index3 <<- input$epic.scenarios.table_rows_selected
+        if(pc_index3 == pc_index1 | pc_index3 == pc_index2) {
+          pc_index3 <<- 0
+          } else {
+            output$row.choice.table3 <- renderUI({
+              place_card(pc_index3)
+              })
+          }
       }
-    }
     }
   })
   #Clear All choice boxes
