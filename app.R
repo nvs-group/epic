@@ -19,8 +19,9 @@ library(shinyalert)
 library(rdrop2)
 library(assertive)
 
+#drop_auth(new_user = TRUE)
 #token <- drop_auth()
-#saveRDS(token, "droptoken.rds", compress = FALSE)
+#saveRDS(token, "droptoken.rds")
 token <- readRDS("droptoken.rds")
 drop_auth(rdstoken = "droptoken.rds")
 # Then pass the token to each drop_ function
