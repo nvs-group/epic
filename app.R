@@ -31,30 +31,37 @@ drop_auth(rdstoken = "droptoken.rds")
 #master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1", stringsAsFactors = F)
 ################## new way to read in comma delineated file on locate machine.
 master1 <- read.csv("Master1.csv", stringsAsFactors = FALSE)
+#master2 <- drop_read_csv("Master1.csv", stringsAsFactors = FALSE)
 scenario_temp <- master1[FALSE,]
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
+#saveRDS(cip1, "ciptest.rds")
+#cip1 <- readRDS("ciptest.rds")
 #Read soc data table and order alphabetically
 soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
+#saveRDS(soc1, "soctest.rds")
+#soc1 <- readRDS("soctest.rds")
 #Credentials
 #credentials = data.frame(
+#  unique_id = 1,
+#  full_name = "Epic NVS",
 #  username_id = "Epic",
-#  passod   = sapply("pass1",password_store),
-#  permission  = c("advanced"), 
-#  stringsAsFactors = F)
+#  passod   = sapply("pass1", sodium::password_store),
+#  stringsAsFactors = F, row.names = NULL)
+
 #saveRDS(credentials, "cred.rds")
 #drop_upload("cred.rds", path = "responses")
 drop_download("responses/cred.rds", overwrite = TRUE)
 credentials <- readRDS("cred.rds")
-
+unique_index <- 0
 # Data frame to convert degree code to number of years for degree
 deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"N/A")
 #years <- c(.8,1.5,2,3,4,5,6,7,3,5,10,7,8,0)
 years <- c(1,2,2,3,4,5,6,7,3,5,10,7,8,0)
 num.years <- data.frame(deg.code, years, stringsAsFactors = FALSE)
-
+#variables for cards and graph
 pc_index1 <- 0
 pc_index2 <- 0
 pc_index3 <- 0
@@ -69,7 +76,7 @@ cg_years <- data.frame(years = numeric())
 cg_card1 <- data.frame(card1 = numeric())
 cg_card2 <- data.frame(card2 = numeric())
 cg_card3 <- data.frame(card3 = numeric())
-
+#Function to create Place card
 place_card <- function(index){
   dc <- scenario_temp$degree.code[index]
   nyear <- filter(num.years, deg.code %in% dc) %>% select(years)
@@ -89,6 +96,7 @@ place_card <- function(index){
                   scenario_temp$X17p[index])
   return(pcresult)
 }
+
 init_variables <- function(){
   cummulative_table <<- cummulative_table[FALSE]
   #  cummulative_graph <<- data.frame(col = numeric(), nomatch=NULL )
@@ -136,7 +144,6 @@ create_years <- function(num_years2) {
   for(i in(0:num_years2)){
     cg_years <<- rbind(cg_years, as.numeric(i))
   }
-  
   cummulative_graph <<- cg_years
   colnames(cummulative_graph) <<- c("years")
   graph_label1 <- paste0(scenario_temp$occ.name[pc_index1],"\n",scenario_temp$school.name[pc_index1],"\n")
@@ -421,6 +428,8 @@ server <- function(input, output, session) {
         pasverify <- password_verify(pasmatch, Password)
         if(pasverify) {
           USER$login <- TRUE
+          unique_index <<- filter(credentials, username_id %in% Username, passod %in% pasmatch) %>% select(unique_id)
+          print(unique_index)
         } else {
           shinyalert(title = "Username or Password incorrect", type = "error")
         }
@@ -438,8 +447,7 @@ server <- function(input, output, session) {
                     font-weight: bold; margin:5px; padding: 10px;")
   })
   output$sidebarpanel <- renderUI({
-    if (USER$login == TRUE ){ 
-      if (credentials[,"permission"][which(credentials$username_id==input$userName)]=="advanced") {
+    if (USER$login == TRUE ){
         sidebarMenu(id = "tabs",
                     menuItem("Home Page",
                              menuSubItem("Instructions", tabName = "instructions")),
@@ -451,7 +459,6 @@ server <- function(input, output, session) {
                     menuItem("Tools", tabName = "tools", icon = icon("toolbox")),
                     menuItem("About", tabName = "about", icon = icon("info"))
         )
-      }
     } else {
       sidebarMenu(id = "log_tabs",
                   menuItem("Login", tabName = "login")
@@ -674,28 +681,27 @@ server <- function(input, output, session) {
     if(pc_index3 > 0) {
       index <- pc_index3
       create_data(index, num_years2)
-    }   
-
+    }
     output$cummulative.plot <- renderPlot(height = 600,{
       graph_parameters
     })
   })
   #Save scenario
   observeEvent(input$save_scenario,{
-    filename <- paste0(input$userName, ".rds")
+    filename <- paste0(input$userName,unique_index, ".rds")
     saveRDS(scenario_temp, filename)
     drop_upload(filename, path = "responses")
     shinyalert(title = "Saved!", type = "success")
   })
   #Load scenario
   observeEvent(input$load_scenario, {
-    filename2 <- paste0("responses/",input$userName, ".rds")
+    filename2 <- paste0("responses/",input$userName,unique_index, ".rds")
     if(drop_exists(filename2) == FALSE) {
       shinyalert(title = "File Not Found", type = "error")
     } else {
       #      filename2 <- paste0("responses", filename)
       drop_download(filename2, overwrite = TRUE)
-      filename <- paste0(input$userName, ".rds")
+      filename <- paste0(input$userName,unique_index, ".rds")
       scenario_temp <<- readRDS(filename)
       shinyalert(title = "Loaded", type = "success")
     } 
@@ -703,7 +709,8 @@ server <- function(input, output, session) {
   observeEvent(input$add_user, {
     ### This is the pop up board for input a new row
     showModal(modalDialog(title = "Add a new account",
-                          textInput(paste0("Names_add", input$Add_row_head), "Name"),
+                          textInput(paste0("Full_name", input$Add_row_head), "Full Name"),
+                          textInput(paste0("Names_add", input$Add_row_head), "User Name"),
                           textInput(paste0("Password_add", input$Add_row_head), "Password"), 
                           actionButton("go", "Add item"),
                           easyClose = TRUE, footer = NULL ))
@@ -711,14 +718,17 @@ server <- function(input, output, session) {
   ### Add a new row to DT  
   observeEvent(input$go, {
     new_row=data.frame(
+      unique_id = nrow(credentials) + 1,
+      full_name = input[[paste0("Full_name", input$Add_row_head)]],
       username_id = input[[paste0("Names_add", input$Add_row_head)]],
-      passod = sapply(input[[paste0("Password_add", input$Add_row_head)]],password_store),
-      permission = "advanced",
-      stringsAsFactors = FALSE
+      passod = sapply(input[[paste0("Password_add", input$Add_row_head)]],sodium::password_store),
+      stringsAsFactors = FALSE, row.names = NULL
     )
     credentials <<- rbind(credentials, new_row)
     saveRDS(credentials, "cred.rds")
     drop_upload("cred.rds", path = "responses")
+    updateTextInput(session, "userName", value = input[[paste0("Names_add", input$Add_row_head)]])
+    updateTextInput(session, "passwd", value = input[[paste0("Password_add", input$Add_row_head)]])
     removeModal()
   })
 }
