@@ -53,10 +53,10 @@ soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #  passod   = sapply("pass1", sodium::password_store),
 #  stringsAsFactors = F, row.names = NULL)
 
-#saveRDS(credentials, "cred.rds")
-#drop_upload("cred.rds", path = "responses")
-drop_download("responses/cred.rds", overwrite = TRUE)
-credentials <- readRDS("cred.rds")
+#saveRDS(credentials, "cred2.rds")
+#drop_upload("cred2.rds", path = "responses")
+drop_download("responses/cred2.rds", overwrite = TRUE)
+credentials <- readRDS("cred2.rds")
 unique_index <- 0
 # Data frame to convert degree code to number of years for degree
 deg.code <- c(1,2,3,4,5,6,7,8,13,14,17,18,19,"N/A")
@@ -100,8 +100,7 @@ place_card <- function(index){
 }
 
 init_variables <- function(){
-  cummulative_table <<- cummulative_table[FALSE]
-  #  cummulative_graph <<- data.frame(col = numeric(), nomatch=NULL )
+  cummulative_table <<- NULL
   raw_table <<- raw_table[FALSE]
   cg_years <<- cg_years[FALSE]
   cg_card1 <<- data.frame(card1 = numeric())
@@ -147,7 +146,7 @@ create_years <- function(num_years2) {
     cg_years <<- rbind(cg_years, as.numeric(i))
   }
   cummulative_graph <<- cg_years
-  colnames(cummulative_graph) <<- c("years")
+  names(cummulative_graph)[1] <<- c("years")
   graph_label1 <- paste0(scenario_temp$occ.name[pc_index1],"\n",scenario_temp$school.name[pc_index1],"\n")
   graph_label2 <- paste0(scenario_temp$occ.name[pc_index2],"\n",scenario_temp$school.name[pc_index2],"\n")
   graph_label3 <- paste0(scenario_temp$occ.name[pc_index3],"\n",scenario_temp$school.name[pc_index3],"\n")
@@ -621,10 +620,11 @@ server <- function(input, output, session) {
 
   observeEvent(input$add_one_compare, {
     if(!is.null(input$epic.scenarios.table_rows_selected)) {
-      pc_index1 <<- input$epic.scenarios.table_rows_selected
-      if(pc_index1 == pc_index2 | pc_index1 == pc_index3) {
-        pc_index1 <<- 0
+      pc_temp <- input$epic.scenarios.table_rows_selected
+      if(pc_temp == pc_index2 | pc_temp == pc_index3) {
+        return()
         } else {
+          pc_index1 <<- pc_temp
           output$row.choice.table1 <- renderUI({
             place_card(pc_index1)
             })
@@ -634,10 +634,11 @@ server <- function(input, output, session) {
   observeEvent(input$add_two_compare, {
     if(!is.null(input$epic.scenarios.table_rows_selected)) {
       if(pc_index1 > 0){
-        pc_index2 <<- input$epic.scenarios.table_rows_selected
-        if(pc_index2 == pc_index1 | pc_index2 == pc_index3) {
-          pc_index2 <<- 0
+        pc_temp <- input$epic.scenarios.table_rows_selected
+        if(pc_temp == pc_index1 | pc_temp == pc_index3) {
+          return()
           } else {
+            pc_index2 <<- pc_temp
             output$row.choice.table2 <- renderUI({
               place_card(pc_index2)
               })
@@ -648,10 +649,11 @@ server <- function(input, output, session) {
   observeEvent(input$add_three_compare, {
     if(!is.null(input$epic.scenarios.table_rows_selected)) {
       if(pc_index1 > 0 && pc_index2 > 0){
-        pc_index3 <<- input$epic.scenarios.table_rows_selected
-        if(pc_index3 == pc_index1 | pc_index3 == pc_index2) {
-          pc_index3 <<- 0
+        pc_temp <- input$epic.scenarios.table_rows_selected
+        if(pc_temp == pc_index1 | pc_temp == pc_index2) {
+          return()
           } else {
+            pc_index3 <<- pc_temp
             output$row.choice.table3 <- renderUI({
               place_card(pc_index3)
               })
@@ -728,8 +730,8 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE, row.names = NULL
     )
     credentials <<- rbind(credentials, new_row)
-    saveRDS(credentials, "cred.rds")
-    drop_upload("cred.rds", path = "responses")
+    saveRDS(credentials, "cred2.rds")
+    drop_upload("cred2.rds", path = "responses")
     updateTextInput(session, "userName", value = input[[paste0("Names_add", input$Add_row_head)]])
     updateTextInput(session, "passwd", value = input[[paste0("Password_add", input$Add_row_head)]])
     removeModal()
