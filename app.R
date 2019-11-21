@@ -37,11 +37,13 @@ scenario_temp <- master1[FALSE,]
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
 #saveRDS(cip1, "ciptest.rds")
+#drop_upload("ciptest.rds")
 #cip1 <- readRDS("ciptest.rds")
 #Read soc data table and order alphabetically
 soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
 #saveRDS(soc1, "soctest.rds")
+#drop_upload("soctest.rds")
 #soc1 <- readRDS("soctest.rds")
 #Credentials
 #credentials = data.frame(
@@ -386,6 +388,7 @@ body <- dashboardBody(
              )
     ),
     tabItem(tabName = "login",
+            shinyjs::useShinyjs(),
             div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
                 wellPanel(
                   tags$h2("LOG IN", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
@@ -406,7 +409,8 @@ body <- dashboardBody(
                     actionButton("add_user", "Create Account", style = "color: white; background-color:#808080;
                                  padding: 10px 15px; width: 200px; cursor: pointer;
                                  font-size: 16px; font-weight: 600;"),
-                    br()
+                    br(),
+                    includeScript("returnClick.js")
                   )
                   )
             ))
@@ -429,7 +433,6 @@ server <- function(input, output, session) {
         if(pasverify) {
           USER$login <- TRUE
           unique_index <<- filter(credentials, username_id %in% Username, passod %in% pasmatch) %>% select(unique_id)
-          print(unique_index)
         } else {
           shinyalert(title = "Username or Password incorrect", type = "error")
         }
