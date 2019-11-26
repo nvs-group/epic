@@ -1,3 +1,5 @@
+## 2019 11 26 - SQL works.  Load button is wierd. But I'm closing development on this file/branch for now.
+
 ## app.R ##
 library(shiny)
 options(shiny.port = 1221)
